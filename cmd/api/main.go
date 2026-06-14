@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"go-marketplace/internal"
 	"log"
@@ -46,20 +47,21 @@ func main() {
 	mux.HandleFunc("POST /products", handler.PostProductsHandler)
 	mux.HandleFunc("DELETE /products/{id}", handler.DeleteProductHandler)
 
-	middlewareMux := internal.SecurityHeaders(mux)
+	cert := "cmd/api/cert.pem"
+	key := "cmd/api/key.pem"
+
 	addr := fmt.Sprintf(":%s", os.Getenv("API_PORT"))
+	middlewareMux := internal.SecurityHeaders(mux)
+	tlsConfig := &tls.Config{
+		MinVersion: tls.VersionTLS12,
+	}
+
 	s := http.Server{
-		Addr:    addr,
-		Handler: middlewareMux,
+		Addr:      addr,
+		Handler:   middlewareMux,
+		TLSConfig: tlsConfig,
 	}
 
 	fmt.Printf("Server started at port %s...\n", os.Getenv("API_PORT"))
-	log.Fatal(s.ListenAndServe())
-}
-
-func Middleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		next.ServeHTTP(w, r)
-	})
+	log.Fatal(s.ListenAndServeTLS(cert, key))
 }
