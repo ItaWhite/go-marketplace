@@ -46,12 +46,20 @@ func main() {
 	mux.HandleFunc("POST /products", handler.PostProductsHandler)
 	mux.HandleFunc("DELETE /products/{id}", handler.DeleteProductHandler)
 
+	middlewareMux := internal.SecurityHeaders(mux)
 	addr := fmt.Sprintf(":%s", os.Getenv("API_PORT"))
 	s := http.Server{
 		Addr:    addr,
-		Handler: mux,
+		Handler: middlewareMux,
 	}
 
 	fmt.Printf("Server started at port %s...\n", os.Getenv("API_PORT"))
 	log.Fatal(s.ListenAndServe())
+}
+
+func Middleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		next.ServeHTTP(w, r)
+	})
 }
