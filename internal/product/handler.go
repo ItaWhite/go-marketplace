@@ -1,4 +1,4 @@
-package internal
+package product
 
 import (
 	"encoding/json"
@@ -7,17 +7,17 @@ import (
 	"strconv"
 )
 
-type productHandler struct {
+type ProductHandler struct {
 	service *productService
 }
 
-func NewProductHandler(s *productService) *productHandler {
-	return &productHandler{
+func NewProductHandler(s *productService) *ProductHandler {
+	return &ProductHandler{
 		service: s,
 	}
 }
 
-func (h *productHandler) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
 	productsList, err := h.service.GetAllProducts()
 	if err != nil {
 		slog.Error("GetProductsHandler", "error", err)
@@ -32,7 +32,7 @@ func (h *productHandler) GetProductsHandler(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (h *productHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -56,7 +56,7 @@ func (h *productHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Re
 	}
 }
 
-func (h *productHandler) PostProductsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Request) {
 	var product Product
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
@@ -80,7 +80,7 @@ func (h *productHandler) PostProductsHandler(w http.ResponseWriter, r *http.Requ
 	}
 }
 
-func (h *productHandler) DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) DeleteProductHandler(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {

@@ -1,4 +1,4 @@
-package internal
+package product
 
 type productService struct {
 	repo *productRepository

@@ -4,7 +4,9 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"go-marketplace/internal"
+	"go-marketplace/internal/product"
+	"go-marketplace/internal/storage"
+	"go-marketplace/internal/transport"
 	"log"
 	"net/http"
 	"os"
@@ -18,7 +20,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	db, err := internal.ConnectDb(os.Getenv("POSTGRES_URL"))
+	db, err := storage.ConnectDb(os.Getenv("POSTGRES_URL"))
 	if err != nil {
 		log.Fatal("Error connecting to database")
 	}
@@ -28,9 +30,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Error pinging the database")
 	}
-	repository := internal.NewProductRepository(db)
-	service := internal.NewProductService(repository)
-	handler := internal.NewProductHandler(service)
+	repository := product.NewProductRepository(db)
+	service := product.NewProductService(repository)
+	handler := product.NewProductHandler(service)
 
 	err = repository.DropSchema()
 	if err != nil {
@@ -41,13 +43,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mux := internal.Router(handler)
+	mux := transport.Router(handler)
 
 	cert := "cmd/api/cert.pem"
 	key := "cmd/api/key.pem"
 
 	addr := fmt.Sprintf(":%s", os.Getenv("API_PORT"))
-	middlewareMux := internal.SecurityHeaders(mux)
+	middlewareMux := transport.SecurityHeaders(mux)
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS12,
 	}

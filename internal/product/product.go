@@ -1,4 +1,4 @@
-package internal
+package product
 
 import "github.com/jackc/pgx/v5/pgtype"
 
