@@ -41,11 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /products", handler.GetProductsHandler)
-	mux.HandleFunc("GET /products/{id}", handler.GetProductByIdHandler)
-	mux.HandleFunc("POST /products", handler.PostProductsHandler)
-	mux.HandleFunc("DELETE /products/{id}", handler.DeleteProductHandler)
+	mux := internal.Router(handler)
 
 	cert := "cmd/api/cert.pem"
 	key := "cmd/api/key.pem"
