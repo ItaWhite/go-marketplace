@@ -61,8 +61,12 @@ func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "content type must be application/json", http.StatusBadRequest)
 		return
 	}
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+
 	var product Product
-	err := json.NewDecoder(r.Body).Decode(&product)
+	dec := json.NewDecoder(r.Body)
+	dec.DisallowUnknownFields()
+	err := dec.Decode(&product)
 	if err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		slog.Error("PostProductsHandler", "error", err)
