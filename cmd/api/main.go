@@ -56,9 +56,12 @@ func main() {
 	}
 
 	s := http.Server{
-		Addr:      addr,
-		Handler:   middlewareMux,
-		TLSConfig: tlsConfig,
+		Addr:         addr,
+		Handler:      middlewareMux,
+		TLSConfig:    tlsConfig,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  60 * time.Second,
 	}
 
 	go func() {
