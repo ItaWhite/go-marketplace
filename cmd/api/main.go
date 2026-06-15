@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"go-marketplace/internal/product"
@@ -9,11 +10,16 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+
 	err := godotenv.Load("cmd/api/.env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -55,6 +61,15 @@ func main() {
 		TLSConfig: tlsConfig,
 	}
 
-	fmt.Printf("Server started at port %s...\n", os.Getenv("API_PORT"))
-	log.Fatal(s.ListenAndServeTLS(cert, key))
+	go func() {
+		fmt.Printf("Server started at port %s...\n", os.Getenv("API_PORT"))
+		log.Fatal(s.ListenAndServeTLS(cert, key))
+	}()
+
+	<-ctx.Done()
+
+	ctx, stop := context.WithTimeout(context.Background(), time.Second*5)
+	defer stop()
+
+	log.Fatal(s.Shutdown(ctx))
 }
