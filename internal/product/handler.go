@@ -19,7 +19,7 @@ func NewProductHandler(s *productService) *ProductHandler {
 }
 
 func (h *ProductHandler) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
-	productsList, err := h.service.GetAllProducts()
+	productsList, err := h.service.GetAllProducts(r.Context())
 	if err != nil {
 		slog.Error("GetProductsHandler", "error", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
@@ -41,7 +41,7 @@ func (h *ProductHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Re
 		slog.Error("GetProductByIdHandler", "error", err)
 		return
 	}
-	product, err := h.service.GetProductByID(id)
+	product, err := h.service.GetProductByID(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		slog.Error("GetProductByIdHandler", "error", err)
@@ -77,7 +77,7 @@ func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	product, err = h.service.CreateProduct(product)
+	product, err = h.service.CreateProduct(r.Context(), product)
 	if err != nil {
 		slog.Error("PostProductsHandler", "error", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
@@ -100,7 +100,7 @@ func (h *ProductHandler) DeleteProductHandler(w http.ResponseWriter, r *http.Req
 		slog.Error("DeleteProductHandler", "error", err)
 		return
 	}
-	err = h.service.DeleteProduct(id)
+	err = h.service.DeleteProduct(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		slog.Error("DeleteProductHandler", "error", err)

@@ -37,8 +37,8 @@ drop table if exists products;
 	return err
 }
 
-func (r *productRepository) GetAll() ([]Product, error) {
-	rows, err := r.db.Query(context.Background(), "select * from products;")
+func (r *productRepository) GetAll(ctx context.Context) ([]Product, error) {
+	rows, err := r.db.Query(ctx, "select * from products;")
 	if err != nil {
 		return []Product{}, err
 	}
@@ -55,9 +55,9 @@ func (r *productRepository) GetAll() ([]Product, error) {
 	return productList, nil
 }
 
-func (r *productRepository) GetByID(id int) (Product, error) {
+func (r *productRepository) GetByID(ctx context.Context, id int) (Product, error) {
 	var product Product
-	err := r.db.QueryRow(context.Background(), "select * from products where id = $1", id).
+	err := r.db.QueryRow(ctx, "select * from products where id = $1", id).
 		Scan(&product.Id, &product.Name, &product.Price, &product.CreatedAt)
 	if err != nil {
 		return Product{}, err
@@ -65,8 +65,8 @@ func (r *productRepository) GetByID(id int) (Product, error) {
 	return product, nil
 }
 
-func (r *productRepository) Create(product Product) (Product, error) {
-	err := r.db.QueryRow(context.Background(), "insert into products (name, price) values ($1, $2) returning id, created_at",
+func (r *productRepository) Create(ctx context.Context, product Product) (Product, error) {
+	err := r.db.QueryRow(ctx, "insert into products (name, price) values ($1, $2) returning id, created_at",
 		product.Name, product.Price).Scan(&product.Id, &product.CreatedAt)
 	if err != nil {
 		return Product{}, err
@@ -74,8 +74,8 @@ func (r *productRepository) Create(product Product) (Product, error) {
 	return product, nil
 }
 
-func (r *productRepository) Delete(id int) error {
-	_, err := r.db.Exec(context.Background(), "delete from products where id = $1", id)
+func (r *productRepository) Delete(ctx context.Context, id int) error {
+	_, err := r.db.Exec(ctx, "delete from products where id = $1", id)
 	if err != nil {
 		return err
 	}
