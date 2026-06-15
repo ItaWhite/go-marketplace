@@ -2,14 +2,21 @@ package storage
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func ConnectDb(url string) (*pgxpool.Pool, error) {
-	dbpool, err := pgxpool.New(context.Background(), url)
+func NewPostgres(url string) (*pgxpool.Pool, error) {
+	db, err := pgxpool.New(context.Background(), url)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error connecting to database: %w", err)
 	}
-	return dbpool, nil
+
+	err = db.Ping(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("error pinging the database: %w", err)
+	}
+
+	return db, nil
 }

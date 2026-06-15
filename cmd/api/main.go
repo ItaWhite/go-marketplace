@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"crypto/tls"
 	"fmt"
 	"go-marketplace/internal/product"
@@ -20,16 +19,12 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	db, err := storage.ConnectDb(os.Getenv("POSTGRES_URL"))
+	db, err := storage.NewPostgres(os.Getenv("POSTGRES_URL"))
 	if err != nil {
-		log.Fatal("Error connecting to database")
+		log.Fatal(err)
 	}
 	defer db.Close()
 
-	err = db.Ping(context.Background())
-	if err != nil {
-		log.Fatal("Error pinging the database")
-	}
 	repository := product.NewProductRepository(db)
 	service := product.NewProductService(repository)
 	handler := product.NewProductHandler(service)
