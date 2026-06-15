@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type ProductHandler struct {
@@ -57,6 +58,12 @@ func (h *ProductHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Re
 }
 
 func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Request) {
+	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
+		w.Header().Set("Content-Type", "text/plain")
+		slog.Error("PostProductsHandler", "error", "wrong content type")
+		http.Error(w, "content type must be application/json", http.StatusBadRequest)
+		return
+	}
 	var product Product
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
@@ -65,6 +72,12 @@ func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Requ
 		slog.Error("PostProductsHandler", "error", err)
 		return
 	}
+	if product.Name == "" || product.Price == 0 {
+		w.Header().Set("Content-Type", "text/plain")
+		http.Error(w, "all fields are required", http.StatusBadRequest)
+		return
+	}
+
 	product, err = h.service.CreateProduct(product)
 	if err != nil {
 		slog.Error("PostProductsHandler", "error", err)
