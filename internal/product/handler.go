@@ -37,14 +37,12 @@ func (h *ProductHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Re
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, "invalid product id", http.StatusBadRequest)
 		slog.Error("GetProductByIdHandler", "error", err)
 		return
 	}
 	product, err := h.service.GetProductByID(id)
 	if err != nil {
-		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		slog.Error("GetProductByIdHandler", "error", err)
 		return
@@ -59,7 +57,6 @@ func (h *ProductHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Re
 
 func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
-		w.Header().Set("Content-Type", "text/plain")
 		slog.Error("PostProductsHandler", "error", "wrong content type")
 		http.Error(w, "content type must be application/json", http.StatusBadRequest)
 		return
@@ -67,13 +64,11 @@ func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Requ
 	var product Product
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
-		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		slog.Error("PostProductsHandler", "error", err)
 		return
 	}
 	if product.Name == "" || product.Price == 0 {
-		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, "all fields are required", http.StatusBadRequest)
 		return
 	}
@@ -97,14 +92,12 @@ func (h *ProductHandler) DeleteProductHandler(w http.ResponseWriter, r *http.Req
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, "invalid product id", http.StatusBadRequest)
 		slog.Error("DeleteProductHandler", "error", err)
 		return
 	}
 	err = h.service.DeleteProduct(id)
 	if err != nil {
-		w.Header().Set("Content-Type", "text/plain")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		slog.Error("DeleteProductHandler", "error", err)
 		return
