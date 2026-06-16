@@ -2,6 +2,7 @@ package product
 
 import (
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -43,8 +44,13 @@ func (h *ProductHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Re
 	}
 	product, err := h.service.GetProductByID(r.Context(), id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
 		slog.Error("GetProductByIdHandler", "error", err)
+		switch {
+		case errors.Is(err, ErrInvalidID):
+			http.Error(w, "invalid product id", http.StatusBadRequest)
+		default:
+			http.Error(w, "internal error", http.StatusInternalServerError)
+		}
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -80,7 +86,15 @@ func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Requ
 	product, err = h.service.CreateProduct(r.Context(), product)
 	if err != nil {
 		slog.Error("PostProductsHandler", "error", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		switch {
+		case errors.Is(err, ErrInvalidName):
+			http.Error(w, "invalid name", http.StatusBadRequest)
+		case errors.Is(err, ErrInvalidPrice):
+			http.Error(w, "invalid price", http.StatusBadRequest)
+		default:
+			http.Error(w, "internal error", http.StatusInternalServerError)
+
+		}
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -96,8 +110,13 @@ func (h *ProductHandler) DeleteProductHandler(w http.ResponseWriter, r *http.Req
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "invalid product id", http.StatusBadRequest)
 		slog.Error("DeleteProductHandler", "error", err)
+		switch {
+		case errors.Is(err, ErrInvalidID):
+			http.Error(w, "invalid product id", http.StatusBadRequest)
+		default:
+			http.Error(w, "internal error", http.StatusInternalServerError)
+		}
 		return
 	}
 	err = h.service.DeleteProduct(r.Context(), id)
