@@ -23,3 +23,12 @@ func Logging(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func Chain(middlewares ...func(handler http.Handler) http.Handler) func(handler http.Handler) http.Handler {
+	return func(final http.Handler) http.Handler {
+		for i := len(middlewares) - 1; i >= 0; i-- {
+			final = middlewares[i](final)
+		}
+		return final
+	}
+}

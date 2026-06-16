@@ -44,26 +44,29 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mux := transport.Router(handler)
-
-	cert := "cmd/api/cert.pem"
-	key := "cmd/api/key.pem"
-
 	addr := fmt.Sprintf(":%s", os.Getenv("API_PORT"))
-	loggingMux := transport.Logging(mux)
-	middlewareMux := transport.SecurityHeaders(loggingMux)
+
+	mux := transport.Router(handler)
+	chain := transport.Chain(
+		transport.Logging,
+		transport.SecurityHeaders,
+	)
+
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS12,
 	}
 
 	s := http.Server{
 		Addr:         addr,
-		Handler:      middlewareMux,
+		Handler:      chain(mux),
 		TLSConfig:    tlsConfig,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  60 * time.Second,
 	}
+
+	cert := "cmd/api/cert.pem"
+	key := "cmd/api/key.pem"
 
 	go func() {
 		fmt.Printf("Server started at port %s...\n", os.Getenv("API_PORT"))
