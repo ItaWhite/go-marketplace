@@ -12,11 +12,18 @@ var (
 	ErrInvalidPrice = errors.New("invalid price")
 )
 
-type productService struct {
-	repo *productRepository
+type ProductRepository interface {
+	GetAll(ctx context.Context) ([]Product, error)
+	GetByID(ctx context.Context, id int) (Product, error)
+	Create(ctx context.Context, product Product) (Product, error)
+	Delete(ctx context.Context, id int) error
 }
 
-func NewProductService(repo *productRepository) *productService {
+type productService struct {
+	repo ProductRepository
+}
+
+func NewProductService(repo ProductRepository) *productService {
 	return &productService{
 		repo: repo,
 	}
