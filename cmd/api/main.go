@@ -50,7 +50,8 @@ func main() {
 	key := "cmd/api/key.pem"
 
 	addr := fmt.Sprintf(":%s", os.Getenv("API_PORT"))
-	middlewareMux := transport.SecurityHeaders(mux)
+	loggingMux := transport.Logging(mux)
+	middlewareMux := transport.SecurityHeaders(loggingMux)
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS12,
 	}
