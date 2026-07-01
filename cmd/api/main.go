@@ -20,12 +20,12 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	err := godotenv.Load("cmd/api/.env")
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	db, err := storage.NewPostgres(os.Getenv("POSTGRES_URL"))
+	db, err := storage.NewPostgres(os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_DB"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,7 +44,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	addr := fmt.Sprintf(":%s", os.Getenv("API_PORT"))
+	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 
 	mux := transport.Router(handler)
 	chain := transport.Chain(
@@ -69,7 +69,7 @@ func main() {
 	key := "cmd/api/key.pem"
 
 	go func() {
-		fmt.Printf("Server started at port %s...\n", os.Getenv("API_PORT"))
+		fmt.Printf("Server started at port %s...\n", os.Getenv("SERVER_PORT"))
 		log.Fatal(s.ListenAndServeTLS(cert, key))
 	}()
 

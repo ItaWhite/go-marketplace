@@ -7,7 +7,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewPostgres(url string) (*pgxpool.Pool, error) {
+func NewPostgres(user, password, host, database string) (*pgxpool.Pool, error) {
+	url := fmt.Sprintf("postgres://%s:%s@%s:5432/%s?sslmode=disable", user, password, host, database)
 	db, err := pgxpool.New(context.Background(), url)
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to database: %w", err)
