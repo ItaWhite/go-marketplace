@@ -2,9 +2,13 @@ package product
 
 import (
 	"context"
+	"errors"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+var ErrNotFound = errors.New("not found")
 
 type productRepository struct {
 	db *pgxpool.Pool
@@ -60,7 +64,12 @@ func (r *productRepository) GetByID(ctx context.Context, id int) (Product, error
 	err := r.db.QueryRow(ctx, "select * from products where id = $1", id).
 		Scan(&product.Id, &product.Name, &product.Price, &product.CreatedAt)
 	if err != nil {
-		return Product{}, err
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			return Product{}, ErrNotFound
+		default:
+			return Product{}, err
+		}
 	}
 	return product, nil
 }
@@ -81,15 +90,18 @@ func (r *productRepository) Update(ctx context.Context, id int, product Product)
 		return err
 	}
 	if cmd.RowsAffected() == 0 {
-		return err
+		return ErrNotFound
 	}
-	return err
+	return nil
 }
 
 func (r *productRepository) Delete(ctx context.Context, id int) error {
-	_, err := r.db.Exec(ctx, "delete from products where id = $1", id)
+	cmd, err := r.db.Exec(ctx, "delete from products where id = $1", id)
 	if err != nil {
 		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return ErrNotFound
 	}
 	return nil
 }

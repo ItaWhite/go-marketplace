@@ -48,6 +48,8 @@ func (h *ProductHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Re
 		switch {
 		case errors.Is(err, ErrInvalidID):
 			http.Error(w, "invalid product id", http.StatusBadRequest)
+		case errors.Is(err, ErrNotFound):
+			http.Error(w, "product not found", http.StatusNotFound)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)
 		}
@@ -146,6 +148,8 @@ func (h *ProductHandler) PutProductsHandler(w http.ResponseWriter, r *http.Reque
 			http.Error(w, "invalid name", http.StatusBadRequest)
 		case errors.Is(err, ErrInvalidPrice):
 			http.Error(w, "invalid price", http.StatusBadRequest)
+		case errors.Is(err, ErrNotFound):
+			http.Error(w, "product not found", http.StatusNotFound)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)
 		}
@@ -162,6 +166,8 @@ func (h *ProductHandler) DeleteProductHandler(w http.ResponseWriter, r *http.Req
 		switch {
 		case errors.Is(err, ErrInvalidID):
 			http.Error(w, "invalid product id", http.StatusBadRequest)
+		case errors.Is(err, ErrNotFound):
+			http.Error(w, "product not found", http.StatusNotFound)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)
 		}
