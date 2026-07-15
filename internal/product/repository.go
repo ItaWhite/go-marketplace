@@ -74,6 +74,18 @@ func (r *productRepository) Create(ctx context.Context, product Product) (Produc
 	return product, nil
 }
 
+func (r *productRepository) Update(ctx context.Context, id int, product Product) error {
+	cmd, err := r.db.Exec(ctx, "update products set name=$1, price=$2 where id=$3",
+		product.Name, product.Price, id)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return err
+	}
+	return err
+}
+
 func (r *productRepository) Delete(ctx context.Context, id int) error {
 	_, err := r.db.Exec(ctx, "delete from products where id = $1", id)
 	if err != nil {

@@ -16,6 +16,7 @@ type ProductRepository interface {
 	GetAll(ctx context.Context) ([]Product, error)
 	GetByID(ctx context.Context, id int) (Product, error)
 	Create(ctx context.Context, product Product) (Product, error)
+	Update(ctx context.Context, id int, product Product) error
 	Delete(ctx context.Context, id int) error
 }
 
@@ -48,6 +49,19 @@ func (s *productService) CreateProduct(ctx context.Context, product Product) (Pr
 		return Product{}, ErrInvalidPrice
 	}
 	return s.repo.Create(ctx, product)
+}
+
+func (s *productService) UpdateProduct(ctx context.Context, id int, product Product) error {
+	if id <= 0 {
+		return ErrInvalidID
+	}
+	if strings.TrimSpace(product.Name) == "" {
+		return ErrInvalidName
+	}
+	if product.Price < 0 {
+		return ErrInvalidPrice
+	}
+	return s.repo.Update(ctx, id, product)
 }
 
 func (s *productService) DeleteProduct(ctx context.Context, id int) error {
