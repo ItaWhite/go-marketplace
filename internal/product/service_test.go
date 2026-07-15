@@ -40,6 +40,10 @@ func (r *mockProductRepo) Create(ctx context.Context, product Product) (Product,
 	return product, nil
 }
 
+func (r *mockProductRepo) Update(ctx context.Context, id int, product Product) error {
+	return nil
+}
+
 func (r *mockProductRepo) Delete(ctx context.Context, id int) error {
 	delete(r.products, id)
 	return nil
