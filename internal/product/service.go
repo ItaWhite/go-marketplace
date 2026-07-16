@@ -2,14 +2,7 @@ package product
 
 import (
 	"context"
-	"errors"
 	"strings"
-)
-
-var (
-	ErrInvalidID    = errors.New("invalid id")
-	ErrInvalidName  = errors.New("invalid name")
-	ErrInvalidPrice = errors.New("invalid price")
 )
 
 type ProductRepository interface {
