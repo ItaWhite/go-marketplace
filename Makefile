@@ -17,7 +17,7 @@ migrate-create:
 	docker compose run --rm postgres-migrate create -ext sql -dir /migrations -seq init
 
 migrate-up:
-	docker compose run --rm postgres-migrate -path /migrations -database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_DB}?sslmode=disable up
+	docker compose run --rm postgres-migrate -path /migrations -database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable up
 
 migrate-down:
-	docker compose run --rm postgres-migrate -path /migrations -database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_DB}?sslmode=disable down
+	docker compose run --rm postgres-migrate -path /migrations -database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable down
