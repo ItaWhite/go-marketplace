@@ -10,3 +10,8 @@ services:
     ports:
       - "5432:5432"
     restart: always
+
+  postgres-migrate:
+    image: migrate/migrate:v4.19.1
+    volumes:
+      - ${PROJECT_ROOT}/migrations:/migrations
