@@ -3,8 +3,9 @@ package product
 import "github.com/jackc/pgx/v5/pgtype"
 
 type Product struct {
-	Id        int              `json:"id"`
-	Name      string           `json:"name"`
-	Price     int              `json:"price"`
-	CreatedAt pgtype.Timestamp `json:"created_at"`
+	ID        int                `json:"id"`
+	Version   int64              `json:"version"`
+	Name      string             `json:"name"`
+	Price     int                `json:"price"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
