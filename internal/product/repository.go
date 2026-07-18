@@ -18,27 +18,6 @@ func NewProductRepository(db *pgxpool.Pool) *productRepository {
 	}
 }
 
-func (r *productRepository) InitSchema() error {
-	_, err := r.db.Exec(context.Background(), `
-create table if not exists products(
-    id int generated always as identity primary key,
-    name varchar(255) not null,
-    price int not null,
-    created_at timestamp default now()
-);`)
-
-	_, err = r.db.Exec(context.Background(), `
-insert into products (name, price) values ('Test 1', 100), ('Test 2', 200);`)
-	return err
-}
-
-func (r *productRepository) DropSchema() error {
-	_, err := r.db.Exec(context.Background(), `
-drop table if exists products;
-`)
-	return err
-}
-
 func (r *productRepository) GetAll(ctx context.Context) ([]Product, error) {
 	rows, err := r.db.Query(ctx, "select * from products;")
 	if err != nil {

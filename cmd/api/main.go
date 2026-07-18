@@ -35,15 +35,6 @@ func main() {
 	service := product.NewProductService(repository)
 	handler := product.NewProductHandler(service)
 
-	err = repository.DropSchema()
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = repository.InitSchema()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 
 	mux := transport.Router(handler)
