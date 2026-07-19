@@ -1,7 +1,7 @@
 package handler
 
 import (
-	productfeat "go-marketplace/internal/product"
+	productfeat "go-marketplace/internal/product/service"
 )
 
 type ProductHandler struct {

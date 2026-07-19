@@ -1,8 +1,9 @@
-package product
+package service
 
 import (
 	"context"
 	"go-marketplace/internal/core/domain"
+	productfeat "go-marketplace/internal/product"
 	"strings"
 )
 
@@ -30,37 +31,37 @@ func (s *ProductService) GetAllProducts(ctx context.Context) ([]domain.Product, 
 
 func (s *ProductService) GetProductByID(ctx context.Context, id int) (domain.Product, error) {
 	if id <= 0 {
-		return domain.Product{}, ErrInvalidID
+		return domain.Product{}, productfeat.ErrInvalidID
 	}
 	return s.repo.GetByID(ctx, id)
 }
 
 func (s *ProductService) CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
 	if strings.TrimSpace(product.Name) == "" {
-		return domain.Product{}, ErrInvalidName
+		return domain.Product{}, productfeat.ErrInvalidName
 	}
 	if product.Price < 0 {
-		return domain.Product{}, ErrInvalidPrice
+		return domain.Product{}, productfeat.ErrInvalidPrice
 	}
 	return s.repo.Create(ctx, product)
 }
 
 func (s *ProductService) UpdateProduct(ctx context.Context, id int, product domain.Product) error {
 	if id <= 0 {
-		return ErrInvalidID
+		return productfeat.ErrInvalidID
 	}
 	if strings.TrimSpace(product.Name) == "" {
-		return ErrInvalidName
+		return productfeat.ErrInvalidName
 	}
 	if product.Price < 0 {
-		return ErrInvalidPrice
+		return productfeat.ErrInvalidPrice
 	}
 	return s.repo.Update(ctx, id, product)
 }
 
 func (s *ProductService) DeleteProduct(ctx context.Context, id int) error {
 	if id <= 0 {
-		return ErrInvalidID
+		return productfeat.ErrInvalidID
 	}
 	return s.repo.Delete(ctx, id)
 }

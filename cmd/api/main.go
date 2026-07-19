@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go-marketplace/internal/product"
 	"go-marketplace/internal/product/handler"
+	"go-marketplace/internal/product/service"
 	"go-marketplace/internal/storage"
 	"go-marketplace/internal/transport"
 	"log"
@@ -33,7 +34,7 @@ func main() {
 	defer db.Close()
 
 	repository := product.NewProductRepository(db)
-	service := product.NewProductService(repository)
+	service := service.NewProductService(repository)
 	handler := handler.NewProductHandler(service)
 
 	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))

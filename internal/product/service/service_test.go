@@ -1,8 +1,9 @@
-package product
+package service
 
 import (
 	"context"
 	"go-marketplace/internal/core/domain"
+	"go-marketplace/internal/product"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -74,14 +75,14 @@ func TestCreate_BlankName(t *testing.T) {
 	mock := newMockProductRepo()
 	s := NewProductService(mock)
 	_, err := s.CreateProduct(context.Background(), domain.Product{Name: "", Price: 100})
-	require.ErrorIs(t, err, ErrInvalidName)
+	require.ErrorIs(t, err, product.ErrInvalidName)
 }
 
 func TestCreate_NegativePrice(t *testing.T) {
 	mock := newMockProductRepo()
 	s := NewProductService(mock)
 	_, err := s.CreateProduct(context.Background(), domain.Product{Name: "Test", Price: -100})
-	require.ErrorIs(t, err, ErrInvalidPrice)
+	require.ErrorIs(t, err, product.ErrInvalidPrice)
 }
 
 func TestGetByID(t *testing.T) {
@@ -97,7 +98,7 @@ func TestGetById_NegativeId(t *testing.T) {
 	mock := newMockProductRepo()
 	s := NewProductService(mock)
 	_, err := s.GetProductByID(context.Background(), -1)
-	require.ErrorIs(t, err, ErrInvalidID)
+	require.ErrorIs(t, err, product.ErrInvalidID)
 }
 
 func TestDelete(t *testing.T) {
@@ -112,5 +113,5 @@ func TestDelete_NegativeId(t *testing.T) {
 	mock := newMockProductRepo()
 	s := NewProductService(mock)
 	err := s.DeleteProduct(context.Background(), -1)
-	require.ErrorIs(t, err, ErrInvalidID)
+	require.ErrorIs(t, err, product.ErrInvalidID)
 }
