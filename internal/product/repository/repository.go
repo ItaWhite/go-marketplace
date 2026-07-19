@@ -1,9 +1,10 @@
-package product
+package repository
 
 import (
 	"context"
 	"errors"
 	"go-marketplace/internal/core/domain"
+	product2 "go-marketplace/internal/product"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -44,7 +45,7 @@ func (r *productRepository) GetByID(ctx context.Context, id int) (domain.Product
 	if err != nil {
 		switch {
 		case errors.Is(err, pgx.ErrNoRows):
-			return domain.Product{}, ErrNotFound
+			return domain.Product{}, product2.ErrNotFound
 		default:
 			return domain.Product{}, err
 		}
@@ -68,7 +69,7 @@ func (r *productRepository) Update(ctx context.Context, id int, product domain.P
 		return err
 	}
 	if cmd.RowsAffected() == 0 {
-		return ErrNotFound
+		return product2.ErrNotFound
 	}
 	return nil
 }
@@ -79,7 +80,7 @@ func (r *productRepository) Delete(ctx context.Context, id int) error {
 		return err
 	}
 	if cmd.RowsAffected() == 0 {
-		return ErrNotFound
+		return product2.ErrNotFound
 	}
 	return nil
 }

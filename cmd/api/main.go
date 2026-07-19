@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"go-marketplace/internal/product"
 	"go-marketplace/internal/product/handler"
+	"go-marketplace/internal/product/repository"
 	"go-marketplace/internal/product/service"
 	"go-marketplace/internal/storage"
 	"go-marketplace/internal/transport"
@@ -33,7 +33,7 @@ func main() {
 	}
 	defer db.Close()
 
-	repository := product.NewProductRepository(db)
+	repository := repository.NewProductRepository(db)
 	service := service.NewProductService(repository)
 	handler := handler.NewProductHandler(service)
 
