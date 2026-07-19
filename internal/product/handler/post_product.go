@@ -8,7 +8,38 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
+	"time"
 )
+
+type PostProductRequest struct {
+	Name  string `json:"name"`
+	Price int    `json:"price"`
+}
+
+type PostProductResponse struct {
+	ID        int       `json:"id"`
+	Version   int64     `json:"version"`
+	Name      string    `json:"name"`
+	Price     int       `json:"price"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func toDomain(dto PostProductRequest) domain.Product {
+	return domain.Product{
+		Name:  dto.Name,
+		Price: dto.Price,
+	}
+}
+
+func toDTO(domain domain.Product) PostProductResponse {
+	return PostProductResponse{
+		ID:        domain.ID,
+		Version:   domain.Version,
+		Name:      domain.Name,
+		Price:     domain.Price,
+		CreatedAt: domain.CreatedAt,
+	}
+}
 
 func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
@@ -16,23 +47,27 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "content type must be application/json", http.StatusBadRequest)
 		return
 	}
+
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
-	var product domain.Product
+	var productRequest PostProductRequest
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
-	err := dec.Decode(&product)
+
+	err := dec.Decode(&productRequest)
 	if err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		slog.Error("PostProductsHandler", "error", err)
 		return
 	}
-	if product.Name == "" || product.Price == 0 {
+	if productRequest.Name == "" || productRequest.Price == 0 {
 		http.Error(w, "all fields are required", http.StatusBadRequest)
 		return
 	}
 
-	product, err = h.service.CreateProduct(r.Context(), product)
+	productDomain := toDomain(productRequest)
+
+	productDomain, err = h.service.CreateProduct(r.Context(), productDomain)
 	if err != nil {
 		slog.Error("PostProductsHandler", "error", err)
 		switch {
@@ -46,11 +81,14 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	productResponse := toDTO(productDomain)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(w).Encode(product)
+
+	err = json.NewEncoder(w).Encode(productResponse)
 	if err != nil {
 		slog.Error("PostProductsHandler", "error", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
 	}
 }
