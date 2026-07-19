@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"go-marketplace/internal/product"
+	"go-marketplace/internal/product/handler"
 	"go-marketplace/internal/storage"
 	"go-marketplace/internal/transport"
 	"log"
@@ -33,7 +34,7 @@ func main() {
 
 	repository := product.NewProductRepository(db)
 	service := product.NewProductService(repository)
-	handler := product.NewProductHandler(service)
+	handler := handler.NewProductHandler(service)
 
 	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 

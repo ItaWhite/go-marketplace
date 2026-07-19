@@ -14,28 +14,28 @@ type ProductRepository interface {
 	Delete(ctx context.Context, id int) error
 }
 
-type productService struct {
+type ProductService struct {
 	repo ProductRepository
 }
 
-func NewProductService(repo ProductRepository) *productService {
-	return &productService{
+func NewProductService(repo ProductRepository) *ProductService {
+	return &ProductService{
 		repo: repo,
 	}
 }
 
-func (s *productService) GetAllProducts(ctx context.Context) ([]domain.Product, error) {
+func (s *ProductService) GetAllProducts(ctx context.Context) ([]domain.Product, error) {
 	return s.repo.GetAll(ctx)
 }
 
-func (s *productService) GetProductByID(ctx context.Context, id int) (domain.Product, error) {
+func (s *ProductService) GetProductByID(ctx context.Context, id int) (domain.Product, error) {
 	if id <= 0 {
 		return domain.Product{}, ErrInvalidID
 	}
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *productService) CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
+func (s *ProductService) CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
 	if strings.TrimSpace(product.Name) == "" {
 		return domain.Product{}, ErrInvalidName
 	}
@@ -45,7 +45,7 @@ func (s *productService) CreateProduct(ctx context.Context, product domain.Produ
 	return s.repo.Create(ctx, product)
 }
 
-func (s *productService) UpdateProduct(ctx context.Context, id int, product domain.Product) error {
+func (s *ProductService) UpdateProduct(ctx context.Context, id int, product domain.Product) error {
 	if id <= 0 {
 		return ErrInvalidID
 	}
@@ -58,7 +58,7 @@ func (s *productService) UpdateProduct(ctx context.Context, id int, product doma
 	return s.repo.Update(ctx, id, product)
 }
 
-func (s *productService) DeleteProduct(ctx context.Context, id int) error {
+func (s *ProductService) DeleteProduct(ctx context.Context, id int) error {
 	if id <= 0 {
 		return ErrInvalidID
 	}

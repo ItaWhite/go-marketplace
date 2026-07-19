@@ -1,11 +1,11 @@
 package transport
 
 import (
-	"go-marketplace/internal/product"
+	"go-marketplace/internal/product/handler"
 	"net/http"
 )
 
-func Router(h *product.ProductHandler) *http.ServeMux {
+func Router(h *handler.ProductHandler) *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /products", h.GetProductsHandler)

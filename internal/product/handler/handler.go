@@ -1,9 +1,10 @@
-package product
+package handler
 
 import (
 	"encoding/json"
 	"errors"
 	"go-marketplace/internal/core/domain"
+	productfeat "go-marketplace/internal/product"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -11,10 +12,10 @@ import (
 )
 
 type ProductHandler struct {
-	service *productService
+	service *productfeat.ProductService
 }
 
-func NewProductHandler(s *productService) *ProductHandler {
+func NewProductHandler(s *productfeat.ProductService) *ProductHandler {
 	return &ProductHandler{
 		service: s,
 	}
@@ -47,9 +48,9 @@ func (h *ProductHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Re
 	if err != nil {
 		slog.Error("GetProductByIdHandler", "error", err)
 		switch {
-		case errors.Is(err, ErrInvalidID):
+		case errors.Is(err, productfeat.ErrInvalidID):
 			http.Error(w, "invalid product id", http.StatusBadRequest)
-		case errors.Is(err, ErrNotFound):
+		case errors.Is(err, productfeat.ErrNotFound):
 			http.Error(w, "product not found", http.StatusNotFound)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)
@@ -90,9 +91,9 @@ func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		slog.Error("PostProductsHandler", "error", err)
 		switch {
-		case errors.Is(err, ErrInvalidName):
+		case errors.Is(err, productfeat.ErrInvalidName):
 			http.Error(w, "invalid name", http.StatusBadRequest)
-		case errors.Is(err, ErrInvalidPrice):
+		case errors.Is(err, productfeat.ErrInvalidPrice):
 			http.Error(w, "invalid price", http.StatusBadRequest)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)
@@ -143,13 +144,13 @@ func (h *ProductHandler) PutProductsHandler(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		slog.Error("PutProductsHandler", "error", err)
 		switch {
-		case errors.Is(err, ErrInvalidID):
+		case errors.Is(err, productfeat.ErrInvalidID):
 			http.Error(w, "invalid product id", http.StatusBadRequest)
-		case errors.Is(err, ErrInvalidName):
+		case errors.Is(err, productfeat.ErrInvalidName):
 			http.Error(w, "invalid name", http.StatusBadRequest)
-		case errors.Is(err, ErrInvalidPrice):
+		case errors.Is(err, productfeat.ErrInvalidPrice):
 			http.Error(w, "invalid price", http.StatusBadRequest)
-		case errors.Is(err, ErrNotFound):
+		case errors.Is(err, productfeat.ErrNotFound):
 			http.Error(w, "product not found", http.StatusNotFound)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)
@@ -165,9 +166,9 @@ func (h *ProductHandler) DeleteProductHandler(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		slog.Error("DeleteProductHandler", "error", err)
 		switch {
-		case errors.Is(err, ErrInvalidID):
+		case errors.Is(err, productfeat.ErrInvalidID):
 			http.Error(w, "invalid product id", http.StatusBadRequest)
-		case errors.Is(err, ErrNotFound):
+		case errors.Is(err, productfeat.ErrNotFound):
 			http.Error(w, "product not found", http.StatusNotFound)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)
