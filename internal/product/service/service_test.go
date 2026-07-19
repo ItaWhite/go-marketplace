@@ -36,7 +36,7 @@ func (r *mockProductRepo) GetByID(ctx context.Context, id int) (domain.Product, 
 }
 
 func (r *mockProductRepo) Create(ctx context.Context, product domain.Product) (domain.Product, error) {
-	product.Id = r.id
+	product.ID = r.id
 	r.products[r.id] = product
 	r.id++
 	return product, nil
@@ -55,7 +55,7 @@ func TestGetAll(t *testing.T) {
 	mock := newMockProductRepo()
 	s := NewProductService(mock)
 	mock.Create(context.Background(), domain.Product{Name: "Test", Price: 100})
-	products, err := s.GetAllProducts(context.Background())
+	products, err := s.GetProducts(context.Background())
 	require.NoError(t, err)
 	assert.Len(t, products, 1)
 
@@ -66,7 +66,7 @@ func TestCreate(t *testing.T) {
 	s := NewProductService(mock)
 	product, err := s.CreateProduct(context.Background(), domain.Product{Name: "Test", Price: 100})
 	require.NoError(t, err)
-	assert.Equal(t, 1, product.Id)
+	assert.Equal(t, 1, product.ID)
 	assert.Equal(t, "Test", product.Name)
 	assert.Equal(t, 100, product.Price)
 }
@@ -89,15 +89,15 @@ func TestGetByID(t *testing.T) {
 	mock := newMockProductRepo()
 	s := NewProductService(mock)
 	s.CreateProduct(context.Background(), domain.Product{Name: "Test", Price: 100})
-	product, err := s.GetProductByID(context.Background(), 1)
+	product, err := s.GetProduct(context.Background(), 1)
 	require.NoError(t, err)
-	assert.Equal(t, 1, product.Id)
+	assert.Equal(t, 1, product.ID)
 }
 
 func TestGetById_NegativeId(t *testing.T) {
 	mock := newMockProductRepo()
 	s := NewProductService(mock)
-	_, err := s.GetProductByID(context.Background(), -1)
+	_, err := s.GetProduct(context.Background(), -1)
 	require.ErrorIs(t, err, product.ErrInvalidID)
 }
 
