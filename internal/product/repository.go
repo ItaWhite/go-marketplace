@@ -3,6 +3,7 @@ package product
 import (
 	"context"
 	"errors"
+	"go-marketplace/internal/core/domain"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -18,15 +19,15 @@ func NewProductRepository(db *pgxpool.Pool) *productRepository {
 	}
 }
 
-func (r *productRepository) GetAll(ctx context.Context) ([]Product, error) {
+func (r *productRepository) GetAll(ctx context.Context) ([]domain.Product, error) {
 	rows, err := r.db.Query(ctx, "select id, version, name, price, created_at  from products;")
 	if err != nil {
-		return []Product{}, err
+		return []domain.Product{}, err
 	}
 	defer rows.Close()
-	var productList []Product
+	var productList []domain.Product
 	for rows.Next() {
-		var product Product
+		var product domain.Product
 		err = rows.Scan(&product.ID, &product.Version, &product.Name, &product.Price, &product.CreatedAt)
 		if err != nil {
 			return productList, err
@@ -36,31 +37,31 @@ func (r *productRepository) GetAll(ctx context.Context) ([]Product, error) {
 	return productList, nil
 }
 
-func (r *productRepository) GetByID(ctx context.Context, id int) (Product, error) {
-	var product Product
+func (r *productRepository) GetByID(ctx context.Context, id int) (domain.Product, error) {
+	var product domain.Product
 	err := r.db.QueryRow(ctx, "select id, version, name, price, created_at from products where id = $1", id).
 		Scan(&product.ID, &product.Version, &product.Name, &product.Price, &product.CreatedAt)
 	if err != nil {
 		switch {
 		case errors.Is(err, pgx.ErrNoRows):
-			return Product{}, ErrNotFound
+			return domain.Product{}, ErrNotFound
 		default:
-			return Product{}, err
+			return domain.Product{}, err
 		}
 	}
 	return product, nil
 }
 
-func (r *productRepository) Create(ctx context.Context, product Product) (Product, error) {
+func (r *productRepository) Create(ctx context.Context, product domain.Product) (domain.Product, error) {
 	err := r.db.QueryRow(ctx, "insert into products (name, price) values ($1, $2) returning id, version, created_at",
 		product.Name, product.Price).Scan(&product.ID, &product.Version, &product.CreatedAt)
 	if err != nil {
-		return Product{}, err
+		return domain.Product{}, err
 	}
 	return product, nil
 }
 
-func (r *productRepository) Update(ctx context.Context, id int, product Product) error {
+func (r *productRepository) Update(ctx context.Context, id int, product domain.Product) error {
 	cmd, err := r.db.Exec(ctx, "update products set name=$1, price=$2 where id=$3 and version=$4",
 		product.Name, product.Price, id, product.Version)
 	if err != nil {

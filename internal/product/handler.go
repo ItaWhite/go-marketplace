@@ -3,6 +3,7 @@ package product
 import (
 	"encoding/json"
 	"errors"
+	"go-marketplace/internal/core/domain"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -71,7 +72,7 @@ func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Requ
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
-	var product Product
+	var product domain.Product
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 	err := dec.Decode(&product)
@@ -123,7 +124,7 @@ func (h *ProductHandler) PutProductsHandler(w http.ResponseWriter, r *http.Reque
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
-	var product Product
+	var product domain.Product
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 	err = dec.Decode(&product)

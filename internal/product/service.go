@@ -2,14 +2,15 @@ package product
 
 import (
 	"context"
+	"go-marketplace/internal/core/domain"
 	"strings"
 )
 
 type ProductRepository interface {
-	GetAll(ctx context.Context) ([]Product, error)
-	GetByID(ctx context.Context, id int) (Product, error)
-	Create(ctx context.Context, product Product) (Product, error)
-	Update(ctx context.Context, id int, product Product) error
+	GetAll(ctx context.Context) ([]domain.Product, error)
+	GetByID(ctx context.Context, id int) (domain.Product, error)
+	Create(ctx context.Context, product domain.Product) (domain.Product, error)
+	Update(ctx context.Context, id int, product domain.Product) error
 	Delete(ctx context.Context, id int) error
 }
 
@@ -23,28 +24,28 @@ func NewProductService(repo ProductRepository) *productService {
 	}
 }
 
-func (s *productService) GetAllProducts(ctx context.Context) ([]Product, error) {
+func (s *productService) GetAllProducts(ctx context.Context) ([]domain.Product, error) {
 	return s.repo.GetAll(ctx)
 }
 
-func (s *productService) GetProductByID(ctx context.Context, id int) (Product, error) {
+func (s *productService) GetProductByID(ctx context.Context, id int) (domain.Product, error) {
 	if id <= 0 {
-		return Product{}, ErrInvalidID
+		return domain.Product{}, ErrInvalidID
 	}
 	return s.repo.GetByID(ctx, id)
 }
 
-func (s *productService) CreateProduct(ctx context.Context, product Product) (Product, error) {
+func (s *productService) CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
 	if strings.TrimSpace(product.Name) == "" {
-		return Product{}, ErrInvalidName
+		return domain.Product{}, ErrInvalidName
 	}
 	if product.Price < 0 {
-		return Product{}, ErrInvalidPrice
+		return domain.Product{}, ErrInvalidPrice
 	}
 	return s.repo.Create(ctx, product)
 }
 
-func (s *productService) UpdateProduct(ctx context.Context, id int, product Product) error {
+func (s *productService) UpdateProduct(ctx context.Context, id int, product domain.Product) error {
 	if id <= 0 {
 		return ErrInvalidID
 	}
