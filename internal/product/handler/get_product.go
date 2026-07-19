@@ -17,7 +17,7 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 		slog.Error("GetProductByIdHandler", "error", err)
 		return
 	}
-	product, err := h.service.GetProductByID(r.Context(), id)
+	product, err := h.service.GetProduct(r.Context(), id)
 	if err != nil {
 		slog.Error("GetProductByIdHandler", "error", err)
 		switch {

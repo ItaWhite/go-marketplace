@@ -7,7 +7,7 @@ import (
 )
 
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
-	productsList, err := h.service.GetAllProducts(r.Context())
+	productsList, err := h.service.GetProducts(r.Context())
 	if err != nil {
 		slog.Error("GetProductsHandler", "error", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
