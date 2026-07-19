@@ -10,5 +10,5 @@ func (s *ProductService) GetProduct(ctx context.Context, id int) (domain.Product
 	if id <= 0 {
 		return domain.Product{}, productfeat.ErrInvalidID
 	}
-	return s.repo.GetByID(ctx, id)
+	return s.repo.GetProduct(ctx, id)
 }

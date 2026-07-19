@@ -17,5 +17,5 @@ func (s *ProductService) UpdateProduct(ctx context.Context, id int, product doma
 	if product.Price < 0 {
 		return productfeat.ErrInvalidPrice
 	}
-	return s.repo.Update(ctx, id, product)
+	return s.repo.UpdateProduct(ctx, id, product)
 }

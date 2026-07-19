@@ -6,11 +6,11 @@ import (
 )
 
 type ProductRepository interface {
-	GetAll(ctx context.Context) ([]domain.Product, error)
-	GetByID(ctx context.Context, id int) (domain.Product, error)
-	Create(ctx context.Context, product domain.Product) (domain.Product, error)
-	Update(ctx context.Context, id int, product domain.Product) error
-	Delete(ctx context.Context, id int) error
+	GetProducts(ctx context.Context) ([]domain.Product, error)
+	GetProduct(ctx context.Context, id int) (domain.Product, error)
+	CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error)
+	UpdateProduct(ctx context.Context, id int, product domain.Product) error
+	DeleteProduct(ctx context.Context, id int) error
 }
 
 type ProductService struct {

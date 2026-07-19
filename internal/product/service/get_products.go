@@ -6,5 +6,5 @@ import (
 )
 
 func (s *ProductService) GetProducts(ctx context.Context) ([]domain.Product, error) {
-	return s.repo.GetAll(ctx)
+	return s.repo.GetProducts(ctx)
 }

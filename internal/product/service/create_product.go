@@ -14,5 +14,5 @@ func (s *ProductService) CreateProduct(ctx context.Context, product domain.Produ
 	if product.Price < 0 {
 		return domain.Product{}, productfeat.ErrInvalidPrice
 	}
-	return s.repo.Create(ctx, product)
+	return s.repo.CreateProduct(ctx, product)
 }
