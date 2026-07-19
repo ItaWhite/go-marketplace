@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func (h *ProductHandler) GetProductByIdHandler(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {

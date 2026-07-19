@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func (h *ProductHandler) PutProductsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) PutProduct(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {

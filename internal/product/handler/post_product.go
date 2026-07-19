@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func (h *ProductHandler) PostProductsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
 		slog.Error("PostProductsHandler", "error", "wrong content type")
 		http.Error(w, "content type must be application/json", http.StatusBadRequest)

@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (h *ProductHandler) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	productsList, err := h.service.GetAllProducts(r.Context())
 	if err != nil {
 		slog.Error("GetProductsHandler", "error", err)
