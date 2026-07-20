@@ -25,12 +25,12 @@ func toDTOs(domains []domain.Product) []ProductResponse {
 func getQueryParam(r *http.Request, key string) (int, error) {
 	valueStr := r.URL.Query().Get(key)
 	if valueStr == "" {
-		return -1, nil
+		return 0, nil
 	}
 
 	value, err := strconv.Atoi(valueStr)
 	if err != nil {
-		return -2, fmt.Errorf("param %s is not integer: %v: %w", valueStr, err, productfeat.ErrInvalidArgument)
+		return 0, fmt.Errorf("param %s is not integer: %v: %w", valueStr, err, productfeat.ErrInvalidArgument)
 	}
 
 	return value, nil
