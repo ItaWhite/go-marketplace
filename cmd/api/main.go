@@ -33,13 +33,13 @@ func main() {
 	}
 	defer db.Close()
 
-	repository := repository.NewProductRepository(db)
-	service := service.NewProductService(repository)
-	handler := handler.NewProductHandler(service)
+	productRepository := repository.NewProductRepository(db)
+	productService := service.NewProductService(productRepository)
+	productHandler := handler.NewProductHandler(productService)
 
 	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 
-	mux := transport.Router(handler)
+	mux := transport.Router(productHandler)
 	chain := transport.Chain(
 		transport.Logging,
 		transport.SecurityHeaders,
