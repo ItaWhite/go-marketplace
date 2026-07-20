@@ -43,7 +43,7 @@ func toDTO(domain domain.Product) PostProductResponse {
 
 func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
-		slog.Error("PostProductsHandler", "error", "wrong content type")
+		slog.Warn("invalid content type", "content_type", r.Header.Get("Content-Type"))
 		http.Error(w, "content type must be application/json", http.StatusBadRequest)
 		return
 	}
@@ -56,8 +56,8 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 
 	err := dec.Decode(&productRequest)
 	if err != nil {
+		slog.Warn("invalid request body", "error", err)
 		http.Error(w, "invalid request body", http.StatusBadRequest)
-		slog.Error("PostProductsHandler", "error", err)
 		return
 	}
 
@@ -65,13 +65,15 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 
 	productDomain, err = h.service.CreateProduct(r.Context(), productDomain)
 	if err != nil {
-		slog.Error("create product failed", "error", err)
 		switch {
 		case errors.Is(err, productfeat.ErrInvalidName):
+			slog.Warn("invalid name", "error", err)
 			http.Error(w, "invalid name", http.StatusBadRequest)
 		case errors.Is(err, productfeat.ErrInvalidPrice):
+			slog.Warn("invalid price", "error", err)
 			http.Error(w, "invalid price", http.StatusBadRequest)
 		default:
+			slog.Error("create product", "error", err)
 			http.Error(w, "internal error", http.StatusInternalServerError)
 		}
 		return
@@ -84,6 +86,6 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(productResponse)
 	if err != nil {
-		slog.Error("encode product response failed", "error", err)
+		slog.Error("encode product response", "error", err)
 	}
 }
