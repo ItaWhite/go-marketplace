@@ -5,7 +5,7 @@ import (
 	"go-marketplace/internal/core/domain"
 )
 
-func (r *productRepository) GetProducts(ctx context.Context) ([]domain.Product, error) {
+func (r *productRepository) GetProducts(ctx context.Context, limit, offset int) ([]domain.Product, error) {
 	rows, err := r.db.Query(ctx, "select id, version, name, price, created_at  from products;")
 	if err != nil {
 		return []domain.Product{}, err
