@@ -22,16 +22,6 @@ func toDomain(dto PostProductRequest) domain.Product {
 	}
 }
 
-func toDTO(domain domain.Product) ProductResponse {
-	return ProductResponse{
-		ID:        domain.ID,
-		Version:   domain.Version,
-		Name:      domain.Name,
-		Price:     domain.Price,
-		CreatedAt: domain.CreatedAt,
-	}
-}
-
 func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
 		slog.Warn("invalid content type", "content_type", r.Header.Get("Content-Type"))
@@ -70,7 +60,7 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	productResponse := toDTO(productDomain)
+	productResponse := ToDTO(productDomain)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

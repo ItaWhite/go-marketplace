@@ -3,11 +3,24 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"go-marketplace/internal/core/domain"
 	productfeat "go-marketplace/internal/product"
 	"log/slog"
 	"net/http"
 	"strconv"
 )
+
+type GetProductsResponse []ProductResponse
+
+func toDTOs(domains []domain.Product) []ProductResponse {
+	dtos := make([]ProductResponse, len(domains))
+
+	for i, d := range domains {
+		dtos[i] = ToDTO(d)
+	}
+
+	return dtos
+}
 
 func getQueryParam(r *http.Request, key string) (int, error) {
 	valueStr := r.URL.Query().Get(key)
@@ -38,14 +51,18 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	productsList, err := h.service.GetProducts(r.Context(), limit, offset)
+	productDomainsList, err := h.service.GetProducts(r.Context(), limit, offset)
 	if err != nil {
 		slog.Error("GetProductsHandler", "error", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
+
+	productsResponse := GetProductsResponse(toDTOs(productDomainsList))
+
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(productsList)
+
+	err = json.NewEncoder(w).Encode(productsResponse)
 	if err != nil {
 		slog.Error("GetProductsHandler", "error", err)
 		http.Error(w, "internal error", http.StatusInternalServerError)
