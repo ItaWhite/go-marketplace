@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"go-marketplace/internal/core/domain"
 	productfeat "go-marketplace/internal/product"
 	"strings"
@@ -14,5 +15,10 @@ func (s *ProductService) CreateProduct(ctx context.Context, product domain.Produ
 	if product.Price < 0 {
 		return domain.Product{}, productfeat.ErrInvalidPrice
 	}
-	return s.repo.CreateProduct(ctx, product)
+	productDomain, err := s.repo.CreateProduct(ctx, product)
+	if err != nil {
+		return domain.Product{}, fmt.Errorf("create product: %w", err)
+	}
+
+	return productDomain, nil
 }

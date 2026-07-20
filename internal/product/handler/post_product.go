@@ -60,16 +60,12 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 		slog.Error("PostProductsHandler", "error", err)
 		return
 	}
-	if productRequest.Name == "" || productRequest.Price == 0 {
-		http.Error(w, "all fields are required", http.StatusBadRequest)
-		return
-	}
 
 	productDomain := toDomain(productRequest)
 
 	productDomain, err = h.service.CreateProduct(r.Context(), productDomain)
 	if err != nil {
-		slog.Error("PostProductsHandler", "error", err)
+		slog.Error("create product failed", "error", err)
 		switch {
 		case errors.Is(err, productfeat.ErrInvalidName):
 			http.Error(w, "invalid name", http.StatusBadRequest)
@@ -77,7 +73,6 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "invalid price", http.StatusBadRequest)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)
-
 		}
 		return
 	}
@@ -89,6 +84,6 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(productResponse)
 	if err != nil {
-		slog.Error("PostProductsHandler", "error", err)
+		slog.Error("encode product response failed", "error", err)
 	}
 }
