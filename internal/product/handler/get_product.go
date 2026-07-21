@@ -3,21 +3,39 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	productfeat "go-marketplace/internal/product"
 	"log/slog"
 	"net/http"
 	"strconv"
 )
 
-func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
-	idStr := r.PathValue("id")
-	id, err := strconv.Atoi(idStr)
+type GetProductResponse ProductResponse
+
+func getPathValue(r *http.Request, key string) (int, error) {
+	valStr := r.PathValue(key)
+
+	if valStr == "" {
+		return 0, fmt.Errorf("no value by key %v: %w", key, productfeat.ErrInvalidArgument)
+	}
+
+	val, err := strconv.Atoi(valStr)
 	if err != nil {
-		http.Error(w, "invalid product id", http.StatusBadRequest)
-		slog.Error("GetProductByIdHandler", "error", err)
+		return 0, fmt.Errorf("invalid value by key %v: %w: %w", key, err, productfeat.ErrInvalidArgument)
+	}
+
+	return val, nil
+}
+
+func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
+	productID, err := getPathValue(r, "id")
+	if err != nil {
+		slog.Warn("get path value", "error", err)
+		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
-	product, err := h.service.GetProduct(r.Context(), id)
+
+	productDomain, err := h.service.GetProduct(r.Context(), productID)
 	if err != nil {
 		slog.Error("GetProductByIdHandler", "error", err)
 		switch {
@@ -30,10 +48,13 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	productResponse := GetProductResponse(ToDTO(productDomain))
+
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(product)
+
+	err = json.NewEncoder(w).Encode(productResponse)
 	if err != nil {
 		slog.Error("GetProductByIdHandler", "error", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
 	}
 }
