@@ -11,11 +11,11 @@ import (
 )
 
 func (r *productRepository) GetProduct(ctx context.Context, id int) (domain.Product, error) {
-	row := r.db.QueryRow(ctx, "select id, version, name, price, created_at from products where id = $1", id)
+	row := r.db.QueryRow(ctx, "select id, version, name, description, price, created_at from products where id = $1", id)
 
 	var product ProductModel
 
-	err := row.Scan(&product.ID, &product.Version, &product.Name, &product.Price, &product.CreatedAt)
+	err := row.Scan(&product.ID, &product.Version, &product.Name, &product.Description, &product.Price, &product.CreatedAt)
 	if err != nil {
 		switch {
 		case errors.Is(err, pgx.ErrNoRows):
@@ -25,11 +25,12 @@ func (r *productRepository) GetProduct(ctx context.Context, id int) (domain.Prod
 	}
 
 	productDomain := domain.Product{
-		ID:        product.ID,
-		Version:   product.Version,
-		Name:      product.Name,
-		Price:     product.Price,
-		CreatedAt: product.CreatedAt,
+		ID:          product.ID,
+		Version:     product.Version,
+		Name:        product.Name,
+		Description: product.Description,
+		Price:       product.Price,
+		CreatedAt:   product.CreatedAt,
 	}
 
 	return productDomain, nil

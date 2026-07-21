@@ -7,8 +7,8 @@ import (
 )
 
 func (r *productRepository) CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
-	row := r.db.QueryRow(ctx, "insert into products (name, price) values ($1, $2) returning id, version, created_at",
-		product.Name, product.Price)
+	row := r.db.QueryRow(ctx, "insert into products (name, description, price) values ($1, $2, $3) returning id, version, created_at",
+		product.Name, product.Description, product.Price)
 
 	var productModel ProductModel
 
@@ -18,11 +18,12 @@ func (r *productRepository) CreateProduct(ctx context.Context, product domain.Pr
 	}
 
 	productDomain := domain.Product{
-		ID:        productModel.ID,
-		Version:   productModel.Version,
-		Name:      product.Name,
-		Price:     product.Price,
-		CreatedAt: productModel.CreatedAt,
+		ID:          productModel.ID,
+		Version:     productModel.Version,
+		Name:        product.Name,
+		Description: product.Description,
+		Price:       product.Price,
+		CreatedAt:   productModel.CreatedAt,
 	}
 
 	return productDomain, nil

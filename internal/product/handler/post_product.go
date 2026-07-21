@@ -11,8 +11,9 @@ import (
 )
 
 type PostProductRequest struct {
-	Name  string `json:"name"`
-	Price int    `json:"price"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	Price       int     `json:"price"`
 }
 
 func toDomain(dto PostProductRequest) domain.Product {
@@ -32,6 +33,7 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
 	var productRequest PostProductRequest
+	
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 

@@ -7,7 +7,7 @@ import (
 )
 
 func (r *productRepository) GetProducts(ctx context.Context, limit, offset int) ([]domain.Product, error) {
-	query := "select id, version, name, price, created_at  from products order by id"
+	query := "select id, version, name, description, price, created_at  from products order by id"
 
 	var args []any
 
@@ -31,7 +31,7 @@ func (r *productRepository) GetProducts(ctx context.Context, limit, offset int) 
 	for rows.Next() {
 		var product ProductModel
 
-		err = rows.Scan(&product.ID, &product.Version, &product.Name, &product.Price, &product.CreatedAt)
+		err = rows.Scan(&product.ID, &product.Version, &product.Name, &product.Description, &product.Price, &product.CreatedAt)
 		if err != nil {
 			return nil, fmt.Errorf("error scan: %w", err)
 		}
@@ -46,11 +46,12 @@ func (r *productRepository) GetProducts(ctx context.Context, limit, offset int) 
 
 	for i, m := range productList {
 		productDomainsList[i] = domain.Product{
-			ID:        m.ID,
-			Version:   m.Version,
-			Name:      m.Name,
-			Price:     m.Price,
-			CreatedAt: m.CreatedAt,
+			ID:          m.ID,
+			Version:     m.Version,
+			Name:        m.Name,
+			Description: m.Description,
+			Price:       m.Price,
+			CreatedAt:   m.CreatedAt,
 		}
 	}
 

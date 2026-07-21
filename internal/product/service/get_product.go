@@ -11,6 +11,7 @@ func (s *ProductService) GetProduct(ctx context.Context, id int) (domain.Product
 	if id <= 0 {
 		return domain.Product{}, core_errors.ErrInvalidID
 	}
+
 	product, err := s.repo.GetProduct(ctx, id)
 	if err != nil {
 		return domain.Product{}, fmt.Errorf("get product: %w", err)
