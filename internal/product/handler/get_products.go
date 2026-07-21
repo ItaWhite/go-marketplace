@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"go-marketplace/internal/core/domain"
 	productfeat "go-marketplace/internal/product"
@@ -39,22 +40,28 @@ func getQueryParam(r *http.Request, key string) (int, error) {
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	limit, err := getQueryParam(r, "limit")
 	if err != nil {
-		slog.Warn("invalid limit", "error", err)
+		slog.Warn("invalid query param", "param", "limit", "error", err)
 		http.Error(w, "invalid limit", http.StatusBadRequest)
 		return
 	}
 
 	offset, err := getQueryParam(r, "offset")
 	if err != nil {
-		slog.Warn("invalid offset", "error", err)
+		slog.Warn("invalid query param", "param", "offset", "error", err)
 		http.Error(w, "invalid offset", http.StatusBadRequest)
 		return
 	}
 
 	productDomainsList, err := h.service.GetProducts(r.Context(), limit, offset)
 	if err != nil {
-		slog.Error("GetProductsHandler", "error", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		switch {
+		case errors.Is(err, productfeat.ErrInvalidArgument):
+			slog.Warn("get products", "error", err)
+			http.Error(w, "invalid limit or offset", http.StatusBadRequest)
+		default:
+			slog.Error("get products", "error", err)
+			http.Error(w, "internal error", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -64,7 +71,6 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(productsResponse)
 	if err != nil {
-		slog.Error("GetProductsHandler", "error", err)
-		http.Error(w, "internal error", http.StatusInternalServerError)
+		slog.Error("encode products response", "error", err)
 	}
 }
