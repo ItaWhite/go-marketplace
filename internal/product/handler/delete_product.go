@@ -18,17 +18,19 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	err = h.service.DeleteProduct(r.Context(), productID)
 	if err != nil {
-		slog.Error("DeleteProductHandler", "error", err)
-
 		switch {
 		case errors.Is(err, core_errors.ErrInvalidID):
+			slog.Warn("invalid id", "error", err)
 			http.Error(w, "invalid product id", http.StatusBadRequest)
 		case errors.Is(err, core_errors.ErrNotFound):
+			slog.Warn("product not found", "error", err)
 			http.Error(w, "product not found", http.StatusNotFound)
 		default:
+			slog.Error("get product", "error", err)
 			http.Error(w, "internal error", http.StatusInternalServerError)
 		}
 		return
 	}
+
 	w.WriteHeader(http.StatusNoContent)
 }
