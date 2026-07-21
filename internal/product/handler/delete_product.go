@@ -3,26 +3,20 @@ package handler
 import (
 	"errors"
 	"go-marketplace/internal/core/transport/errors"
+	"go-marketplace/internal/core/transport/utils"
 	"log/slog"
 	"net/http"
-	"strconv"
 )
 
 func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
-	idStr := r.PathValue("id")
-	id, err := strconv.Atoi(idStr)
+	productID, err := utils.GetPathValue(r, "id")
 	if err != nil {
-		slog.Error("DeleteProductHandler", "error", err)
-		switch {
-		case errors.Is(err, core_errors.ErrInvalidID):
-			http.Error(w, "invalid product id", http.StatusBadRequest)
-		default:
-			http.Error(w, "internal error", http.StatusInternalServerError)
-		}
+		slog.Warn("get path value", "error", err)
+		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
 
-	err = h.service.DeleteProduct(r.Context(), id)
+	err = h.service.DeleteProduct(r.Context(), productID)
 	if err != nil {
 		slog.Error("DeleteProductHandler", "error", err)
 
