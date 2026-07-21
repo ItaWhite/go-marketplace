@@ -1,4 +1,4 @@
-package product
+package core_errors
 
 import "errors"
 

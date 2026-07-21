@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	product2 "go-marketplace/internal/product"
+	"go-marketplace/internal/core/transport/errors"
 )
 
 func (r *productRepository) DeleteProduct(ctx context.Context, id int) error {
@@ -11,7 +11,7 @@ func (r *productRepository) DeleteProduct(ctx context.Context, id int) error {
 		return err
 	}
 	if cmd.RowsAffected() == 0 {
-		return product2.ErrNotFound
+		return core_errors.ErrNotFound
 	}
 	return nil
 }

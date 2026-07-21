@@ -4,16 +4,16 @@ import (
 	"context"
 	"fmt"
 	"go-marketplace/internal/core/domain"
-	productfeat "go-marketplace/internal/product"
+	"go-marketplace/internal/core/transport/errors"
 	"strings"
 )
 
 func (s *ProductService) CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error) {
 	if strings.TrimSpace(product.Name) == "" {
-		return domain.Product{}, productfeat.ErrInvalidName
+		return domain.Product{}, core_errors.ErrInvalidName
 	}
 	if product.Price < 0 {
-		return domain.Product{}, productfeat.ErrInvalidPrice
+		return domain.Product{}, core_errors.ErrInvalidPrice
 	}
 	productDomain, err := s.repo.CreateProduct(ctx, product)
 	if err != nil {

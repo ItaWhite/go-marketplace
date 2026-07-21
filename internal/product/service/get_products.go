@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 	"go-marketplace/internal/core/domain"
-	productfeat "go-marketplace/internal/product"
+	"go-marketplace/internal/core/transport/errors"
 )
 
 func (s *ProductService) GetProducts(ctx context.Context, limit, offset int) ([]domain.Product, error) {
 	if limit < 0 {
-		return nil, fmt.Errorf("limit is negative: %w", productfeat.ErrInvalidArgument)
+		return nil, fmt.Errorf("limit is negative: %w", core_errors.ErrInvalidArgument)
 	}
 	if offset < 0 {
-		return nil, fmt.Errorf("offset is negative: %w", productfeat.ErrInvalidArgument)
+		return nil, fmt.Errorf("offset is negative: %w", core_errors.ErrInvalidArgument)
 	}
 
 	products, err := s.repo.GetProducts(ctx, limit, offset)

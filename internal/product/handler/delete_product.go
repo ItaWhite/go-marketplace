@@ -2,7 +2,7 @@ package handler
 
 import (
 	"errors"
-	productfeat "go-marketplace/internal/product"
+	"go-marketplace/internal/core/transport/errors"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -14,7 +14,7 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error("DeleteProductHandler", "error", err)
 		switch {
-		case errors.Is(err, productfeat.ErrInvalidID):
+		case errors.Is(err, core_errors.ErrInvalidID):
 			http.Error(w, "invalid product id", http.StatusBadRequest)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)
@@ -27,9 +27,9 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		slog.Error("DeleteProductHandler", "error", err)
 
 		switch {
-		case errors.Is(err, productfeat.ErrInvalidID):
+		case errors.Is(err, core_errors.ErrInvalidID):
 			http.Error(w, "invalid product id", http.StatusBadRequest)
-		case errors.Is(err, productfeat.ErrNotFound):
+		case errors.Is(err, core_errors.ErrNotFound):
 			http.Error(w, "product not found", http.StatusNotFound)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)

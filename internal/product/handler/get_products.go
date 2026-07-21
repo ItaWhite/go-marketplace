@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"go-marketplace/internal/core/domain"
+	"go-marketplace/internal/core/transport/errors"
 	"go-marketplace/internal/core/transport/utils"
-	productfeat "go-marketplace/internal/product"
 	"log/slog"
 	"net/http"
 )
@@ -40,7 +40,7 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	productDomainsList, err := h.service.GetProducts(r.Context(), limit, offset)
 	if err != nil {
 		switch {
-		case errors.Is(err, productfeat.ErrInvalidArgument):
+		case errors.Is(err, core_errors.ErrInvalidArgument):
 			slog.Warn("get products", "error", err)
 			http.Error(w, "invalid limit or offset", http.StatusBadRequest)
 		default:

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"go-marketplace/internal/core/domain"
-	productfeat "go-marketplace/internal/product"
+	"go-marketplace/internal/core/transport/errors"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -45,13 +45,13 @@ func (h *ProductHandler) PutProduct(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error("PutProductsHandler", "error", err)
 		switch {
-		case errors.Is(err, productfeat.ErrInvalidID):
+		case errors.Is(err, core_errors.ErrInvalidID):
 			http.Error(w, "invalid product id", http.StatusBadRequest)
-		case errors.Is(err, productfeat.ErrInvalidName):
+		case errors.Is(err, core_errors.ErrInvalidName):
 			http.Error(w, "invalid name", http.StatusBadRequest)
-		case errors.Is(err, productfeat.ErrInvalidPrice):
+		case errors.Is(err, core_errors.ErrInvalidPrice):
 			http.Error(w, "invalid price", http.StatusBadRequest)
-		case errors.Is(err, productfeat.ErrNotFound):
+		case errors.Is(err, core_errors.ErrNotFound):
 			http.Error(w, "product not found", http.StatusNotFound)
 		default:
 			http.Error(w, "internal error", http.StatusInternalServerError)

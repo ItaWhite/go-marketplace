@@ -2,12 +2,12 @@ package service
 
 import (
 	"context"
-	productfeat "go-marketplace/internal/product"
+	"go-marketplace/internal/core/transport/errors"
 )
 
 func (s *ProductService) DeleteProduct(ctx context.Context, id int) error {
 	if id <= 0 {
-		return productfeat.ErrInvalidID
+		return core_errors.ErrInvalidID
 	}
 	return s.repo.DeleteProduct(ctx, id)
 }

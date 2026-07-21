@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	productfeat "go-marketplace/internal/product"
+	"go-marketplace/internal/core/transport/errors"
 	"net/http"
 	"strconv"
 )
@@ -15,7 +15,7 @@ func GetQueryParam(r *http.Request, key string) (int, error) {
 
 	value, err := strconv.Atoi(valueStr)
 	if err != nil {
-		return 0, fmt.Errorf("param %s is not integer: %v: %w", valueStr, err, productfeat.ErrInvalidArgument)
+		return 0, fmt.Errorf("param %s is not integer: %v: %w", valueStr, err, core_errors.ErrInvalidArgument)
 	}
 
 	return value, nil

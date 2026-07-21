@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"go-marketplace/internal/core/domain"
-	productfeat "go-marketplace/internal/product"
+	"go-marketplace/internal/core/transport/errors"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -47,10 +47,10 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 	productDomain, err = h.service.CreateProduct(r.Context(), productDomain)
 	if err != nil {
 		switch {
-		case errors.Is(err, productfeat.ErrInvalidName):
+		case errors.Is(err, core_errors.ErrInvalidName):
 			slog.Warn("invalid name", "error", err)
 			http.Error(w, "invalid name", http.StatusBadRequest)
-		case errors.Is(err, productfeat.ErrInvalidPrice):
+		case errors.Is(err, core_errors.ErrInvalidPrice):
 			slog.Warn("invalid price", "error", err)
 			http.Error(w, "invalid price", http.StatusBadRequest)
 		default:

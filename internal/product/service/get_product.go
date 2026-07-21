@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 	"go-marketplace/internal/core/domain"
-	productfeat "go-marketplace/internal/product"
+	"go-marketplace/internal/core/transport/errors"
 )
 
 func (s *ProductService) GetProduct(ctx context.Context, id int) (domain.Product, error) {
 	if id <= 0 {
-		return domain.Product{}, productfeat.ErrInvalidID
+		return domain.Product{}, core_errors.ErrInvalidID
 	}
 	product, err := s.repo.GetProduct(ctx, id)
 	if err != nil {

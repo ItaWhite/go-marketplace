@@ -3,8 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"errors"
+	"go-marketplace/internal/core/transport/errors"
 	"go-marketplace/internal/core/transport/utils"
-	productfeat "go-marketplace/internal/product"
 	"log/slog"
 	"net/http"
 )
@@ -22,10 +22,10 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 	productDomain, err := h.service.GetProduct(r.Context(), productID)
 	if err != nil {
 		switch {
-		case errors.Is(err, productfeat.ErrInvalidID):
+		case errors.Is(err, core_errors.ErrInvalidID):
 			slog.Warn("invalid id", "error", err)
 			http.Error(w, "invalid product id", http.StatusBadRequest)
-		case errors.Is(err, productfeat.ErrNotFound):
+		case errors.Is(err, core_errors.ErrNotFound):
 			slog.Warn("product not found", "error", err)
 			http.Error(w, "product not found", http.StatusNotFound)
 		default:
