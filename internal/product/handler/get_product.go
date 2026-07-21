@@ -29,7 +29,7 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 			slog.Warn("product not found", "error", err)
 			http.Error(w, "product not found", http.StatusNotFound)
 		default:
-			slog.Warn("get product", "error", err)
+			slog.Error("get product", "error", err)
 			http.Error(w, "internal error", http.StatusInternalServerError)
 		}
 		return
