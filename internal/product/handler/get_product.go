@@ -3,32 +3,16 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
+	"go-marketplace/internal/core/transport/utils"
 	productfeat "go-marketplace/internal/product"
 	"log/slog"
 	"net/http"
-	"strconv"
 )
 
 type GetProductResponse ProductResponse
 
-func getPathValue(r *http.Request, key string) (int, error) {
-	valStr := r.PathValue(key)
-
-	if valStr == "" {
-		return 0, fmt.Errorf("no value by key %v: %w", key, productfeat.ErrInvalidArgument)
-	}
-
-	val, err := strconv.Atoi(valStr)
-	if err != nil {
-		return 0, fmt.Errorf("invalid value by key %v: %w: %w", key, err, productfeat.ErrInvalidArgument)
-	}
-
-	return val, nil
-}
-
 func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
-	productID, err := getPathValue(r, "id")
+	productID, err := utils.GetPathValue(r, "id")
 	if err != nil {
 		slog.Warn("get path value", "error", err)
 		http.Error(w, "invalid id", http.StatusBadRequest)

@@ -3,12 +3,11 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"go-marketplace/internal/core/domain"
+	"go-marketplace/internal/core/transport/utils"
 	productfeat "go-marketplace/internal/product"
 	"log/slog"
 	"net/http"
-	"strconv"
 )
 
 type GetProductsResponse []ProductResponse
@@ -23,29 +22,15 @@ func toDTOs(domains []domain.Product) []ProductResponse {
 	return dtos
 }
 
-func getQueryParam(r *http.Request, key string) (int, error) {
-	valueStr := r.URL.Query().Get(key)
-	if valueStr == "" {
-		return 0, nil
-	}
-
-	value, err := strconv.Atoi(valueStr)
-	if err != nil {
-		return 0, fmt.Errorf("param %s is not integer: %v: %w", valueStr, err, productfeat.ErrInvalidArgument)
-	}
-
-	return value, nil
-}
-
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
-	limit, err := getQueryParam(r, "limit")
+	limit, err := utils.GetQueryParam(r, "limit")
 	if err != nil {
 		slog.Warn("invalid query param", "param", "limit", "error", err)
 		http.Error(w, "invalid limit", http.StatusBadRequest)
 		return
 	}
 
-	offset, err := getQueryParam(r, "offset")
+	offset, err := utils.GetQueryParam(r, "offset")
 	if err != nil {
 		slog.Warn("invalid query param", "param", "offset", "error", err)
 		http.Error(w, "invalid offset", http.StatusBadRequest)
