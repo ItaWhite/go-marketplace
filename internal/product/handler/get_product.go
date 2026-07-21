@@ -37,13 +37,15 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 
 	productDomain, err := h.service.GetProduct(r.Context(), productID)
 	if err != nil {
-		slog.Error("GetProductByIdHandler", "error", err)
 		switch {
 		case errors.Is(err, productfeat.ErrInvalidID):
+			slog.Warn("invalid id", "error", err)
 			http.Error(w, "invalid product id", http.StatusBadRequest)
 		case errors.Is(err, productfeat.ErrNotFound):
+			slog.Warn("product not found", "error", err)
 			http.Error(w, "product not found", http.StatusNotFound)
 		default:
+			slog.Warn("get product", "error", err)
 			http.Error(w, "internal error", http.StatusInternalServerError)
 		}
 		return
@@ -55,6 +57,6 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(productResponse)
 	if err != nil {
-		slog.Error("GetProductByIdHandler", "error", err)
+		slog.Error("encode product response", "error", err)
 	}
 }
