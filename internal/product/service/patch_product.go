@@ -31,7 +31,7 @@ func (s *ProductService) PatchProduct(ctx context.Context, id int, productPatch 
 
 	productDomain, err := s.repo.PatchProduct(ctx, id, productPatch)
 	if err != nil {
-
+		return domain.Product{}, fmt.Errorf("patch product: %w", err)
 	}
 
 	return productDomain, nil

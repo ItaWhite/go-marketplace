@@ -58,7 +58,10 @@ func (h *ProductHandler) PatchProduct(w http.ResponseWriter, r *http.Request) {
 	productDomain, err := h.service.PatchProduct(r.Context(), productID, productPatch)
 	if err != nil {
 		switch {
-		case errors.Is(err, core_errors.ErrInvalidArgument):
+		case errors.Is(err, core_errors.ErrNotFound):
+			slog.Warn("product not found", "error", err)
+			http.Error(w, "product not found", http.StatusNotFound)
+		case errors.Is(err, core_errors.ErrNullNotAllowed):
 			slog.Warn("argument can not be null", "error", err)
 			http.Error(w, "argument can not be null", http.StatusBadRequest)
 		case errors.Is(err, core_errors.ErrInvalidName):
