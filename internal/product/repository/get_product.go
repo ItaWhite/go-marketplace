@@ -19,7 +19,7 @@ func (r *productRepository) GetProduct(ctx context.Context, id int) (domain.Prod
 	if err != nil {
 		switch {
 		case errors.Is(err, pgx.ErrNoRows):
-			return domain.Product{}, fmt.Errorf("user with id=%d not found: %w", id, core_errors.ErrNotFound)
+			return domain.Product{}, fmt.Errorf("product with id=%d not found: %w", id, core_errors.ErrNotFound)
 		}
 		return domain.Product{}, err
 	}

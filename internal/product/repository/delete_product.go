@@ -12,7 +12,7 @@ func (r *productRepository) DeleteProduct(ctx context.Context, id int) error {
 		return fmt.Errorf("exec sql query: %w", err)
 	}
 	if cmd.RowsAffected() == 0 {
-		return fmt.Errorf("user with id=%d not found: %w", id, core_errors.ErrNotFound)
+		return fmt.Errorf("product with id=%d not found: %w", id, core_errors.ErrNotFound)
 	}
 
 	return nil
