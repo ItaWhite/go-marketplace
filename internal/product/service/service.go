@@ -10,7 +10,6 @@ type ProductRepository interface {
 	GetProduct(ctx context.Context, id int) (domain.Product, error)
 	CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error)
 	PatchProduct(ctx context.Context, id int, productPatch domain.ProductPatch) (domain.Product, error)
-	UpdateProduct(ctx context.Context, id int, product domain.Product) error
 	DeleteProduct(ctx context.Context, id int) error
 }
 

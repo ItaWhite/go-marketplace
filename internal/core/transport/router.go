@@ -11,7 +11,6 @@ func Router(h *handler.ProductHandler) *http.ServeMux {
 	mux.HandleFunc("GET /products", h.GetProducts)
 	mux.HandleFunc("GET /products/{id}", h.GetProduct)
 	mux.HandleFunc("POST /products", h.PostProduct)
-	mux.HandleFunc("PUT /products/{id}", h.PutProduct)
 	mux.HandleFunc("PATCH /products/{id}", h.PatchProduct)
 	mux.HandleFunc("DELETE /products/{id}", h.DeleteProduct)
 
