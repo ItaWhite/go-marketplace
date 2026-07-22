@@ -17,6 +17,8 @@ type PatchProductRequest struct {
 	Price       domain.Nullable[int]    `json:"price"`
 }
 
+type PatchProductResponse ProductResponse
+
 func toProductPatchDomain(dto PatchProductRequest) domain.ProductPatch {
 	return domain.ProductPatch{
 		Name:        dto.Name,
@@ -77,7 +79,7 @@ func (h *ProductHandler) PatchProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	productResponse := ToDTO(productDomain)
+	productResponse := PatchProductResponse(ToDTO(productDomain))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

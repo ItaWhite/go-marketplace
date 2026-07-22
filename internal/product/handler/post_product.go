@@ -16,10 +16,13 @@ type PostProductRequest struct {
 	Price       int     `json:"price"`
 }
 
+type PostProductResponse ProductResponse
+
 func toDomain(dto PostProductRequest) domain.Product {
 	return domain.Product{
-		Name:  dto.Name,
-		Price: dto.Price,
+		Name:        dto.Name,
+		Description: dto.Description,
+		Price:       dto.Price,
 	}
 }
 
@@ -33,7 +36,7 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
 	var productRequest PostProductRequest
-	
+
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 
@@ -62,7 +65,7 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	productResponse := ToDTO(productDomain)
+	productResponse := PostProductResponse(ToDTO(productDomain))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
