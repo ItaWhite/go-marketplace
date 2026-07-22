@@ -12,3 +12,9 @@ type Product struct {
 	Price       int       `json:"price"`
 	CreatedAt   time.Time `json:"created_at"`
 }
+
+type ProductPatch struct {
+	Name        Nullable[string]
+	Description Nullable[string]
+	Price       Nullable[int]
+}
