@@ -4,9 +4,11 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"go-marketplace/internal/product"
-	"go-marketplace/internal/storage"
-	"go-marketplace/internal/transport"
+	"go-marketplace/internal/core/storage"
+	"go-marketplace/internal/core/transport"
+	"go-marketplace/internal/product/handler"
+	"go-marketplace/internal/product/repository"
+	"go-marketplace/internal/product/service"
 	"log"
 	"net/http"
 	"os"
@@ -31,22 +33,13 @@ func main() {
 	}
 	defer db.Close()
 
-	repository := product.NewProductRepository(db)
-	service := product.NewProductService(repository)
-	handler := product.NewProductHandler(service)
-
-	err = repository.DropSchema()
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = repository.InitSchema()
-	if err != nil {
-		log.Fatal(err)
-	}
+	productRepository := repository.NewProductRepository(db)
+	productService := service.NewProductService(productRepository)
+	productHandler := handler.NewProductHandler(productService)
 
 	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 
-	mux := transport.Router(handler)
+	mux := transport.Router(productHandler)
 	chain := transport.Chain(
 		transport.Logging,
 		transport.SecurityHeaders,

@@ -1,0 +1,24 @@
+package service
+
+import (
+	"context"
+	"go-marketplace/internal/core/domain"
+)
+
+type ProductRepository interface {
+	GetProducts(ctx context.Context, limit, offset int) ([]domain.Product, error)
+	GetProduct(ctx context.Context, id int) (domain.Product, error)
+	CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error)
+	PatchProduct(ctx context.Context, id int, productPatch domain.ProductPatch) (domain.Product, error)
+	DeleteProduct(ctx context.Context, id int) error
+}
+
+type ProductService struct {
+	repo ProductRepository
+}
+
+func NewProductService(repo ProductRepository) *ProductService {
+	return &ProductService{
+		repo: repo,
+	}
+}
