@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"go-marketplace/internal/core/logger"
 	"net/http"
 )
 
@@ -9,7 +10,7 @@ func Panic(next http.Handler) http.Handler {
 		defer func() {
 			err := recover()
 			if err != nil {
-				logger := LoggerFromContext(r.Context())
+				logger := core_logger.FromContext(r.Context())
 
 				logger.Error("panic recovered", "error", err)
 				http.Error(w, "internal error", http.StatusInternalServerError)
