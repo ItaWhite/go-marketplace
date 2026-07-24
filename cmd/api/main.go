@@ -42,7 +42,7 @@ func main() {
 
 	mux := transport.Router(productHandler)
 	chain := middleware.Chain(
-		middleware.Logging,
+		middleware.Logger,
 		middleware.SecurityHeaders,
 	)
 
