@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"go-marketplace/internal/core/storage"
 	"go-marketplace/internal/core/transport"
+	"go-marketplace/internal/core/transport/middleware"
 	"go-marketplace/internal/product/handler"
 	"go-marketplace/internal/product/repository"
 	"go-marketplace/internal/product/service"
@@ -40,9 +41,11 @@ func main() {
 	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 
 	mux := transport.Router(productHandler)
-	chain := transport.Chain(
-		transport.Logging,
-		transport.SecurityHeaders,
+	chain := middleware.Chain(
+		middleware.RequestID,
+		middleware.Logger,
+		middleware.Panic,
+		middleware.SecurityHeaders,
 	)
 
 	tlsConfig := &tls.Config{
