@@ -25,10 +25,14 @@ func NewResponseHandler(logger *slog.Logger, w http.ResponseWriter) *ResponseHan
 	}
 }
 
-func (h *ResponseHandler) SendJSON(code int, v any) {
+func (h *ResponseHandler) SendResponse(code int, v any) {
 	h.w.Header().Set("Content-Type", "application/json")
 
 	h.w.WriteHeader(code)
+
+	if code == http.StatusNoContent {
+		return
+	}
 
 	err := json.NewEncoder(h.w).Encode(v)
 	if err != nil {
@@ -41,30 +45,42 @@ func (h *ResponseHandler) HandleError(err error) {
 	var msg string
 
 	switch {
-	case errors.Is(err, core_errors.ErrInvalidArgument):
-		msg = "invalid argument"
-		h.logger.Warn(msg, "error", err)
-		code = http.StatusBadRequest
 	case errors.Is(err, core_errors.ErrNullNotAllowed):
-		msg = "argument can not be null"
+		msg = core_errors.ErrNullNotAllowed.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusBadRequest
 	case errors.Is(err, core_errors.ErrInvalidID):
-		msg = "invalid id"
+		msg = core_errors.ErrInvalidID.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusBadRequest
 	case errors.Is(err, core_errors.ErrInvalidName):
-		msg = "invalid name"
+		msg = core_errors.ErrInvalidName.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusBadRequest
 	case errors.Is(err, core_errors.ErrInvalidPrice):
-		msg = "invalid price"
+		msg = core_errors.ErrInvalidPrice.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusBadRequest
 	case errors.Is(err, core_errors.ErrNotFound):
-		msg = "not found"
+		msg = core_errors.ErrNotFound.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusNotFound
+	case errors.Is(err, core_errors.ErrInvalidContentType):
+		msg = core_errors.ErrInvalidContentType.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrInvalidRequestBody):
+		msg = core_errors.ErrInvalidRequestBody.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrInvalidPathValue):
+		msg = core_errors.ErrInvalidPathValue.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrInvalidQueryParam):
+		msg = core_errors.ErrInvalidQueryParam.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
 	default:
 		msg = "internal server error"
 		h.logger.Error(msg, "error", err)
@@ -73,7 +89,7 @@ func (h *ResponseHandler) HandleError(err error) {
 
 	errorResponse := ErrorResponse{Error: msg}
 
-	h.SendJSON(code, errorResponse)
+	h.SendResponse(code, errorResponse)
 }
 
 func (h *ResponseHandler) HandlePanic(p any) {
@@ -83,5 +99,5 @@ func (h *ResponseHandler) HandlePanic(p any) {
 
 	errorResponse := ErrorResponse{Error: "internal server error"}
 
-	h.SendJSON(http.StatusInternalServerError, errorResponse)
+	h.SendResponse(http.StatusInternalServerError, errorResponse)
 }
