@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"go-marketplace/internal/core/logger"
 	"go-marketplace/internal/core/storage"
 	"go-marketplace/internal/core/transport"
 	"go-marketplace/internal/core/transport/middleware"
@@ -11,6 +12,7 @@ import (
 	"go-marketplace/internal/product/repository"
 	"go-marketplace/internal/product/service"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -27,6 +29,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	newLogger := core_logger.NewLogger(os.Getenv("LOGGER_LEVEL"), os.Getenv("LOGGER_FORMAT"))
+	slog.SetDefault(newLogger)
 
 	db, err := storage.NewPostgres(os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_DB"))
 	if err != nil {

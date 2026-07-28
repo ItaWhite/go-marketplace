@@ -2,11 +2,12 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"go-marketplace/internal/core/domain"
-	core_errors "go-marketplace/internal/core/transport/errors"
+	"go-marketplace/internal/core/logger"
+	"go-marketplace/internal/core/transport/errors"
+	"go-marketplace/internal/core/transport/response"
 	"go-marketplace/internal/core/transport/utils"
-	"log/slog"
 	"net/http"
 	"strings"
 )
@@ -28,16 +29,18 @@ func toProductPatchDomain(dto PatchProductRequest) domain.ProductPatch {
 }
 
 func (h *ProductHandler) PatchProduct(w http.ResponseWriter, r *http.Request) {
+	logger := core_logger.FromContext(r.Context())
+	rh := response.NewResponseHandler(logger, w)
+
 	productID, err := utils.GetPathValue(r, "id")
 	if err != nil {
-		slog.Warn("get path value", "error", err)
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		rh.HandleError(fmt.Errorf("get path value: %w", err))
 		return
 	}
 
 	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
-		slog.Warn("invalid content type", "content_type", r.Header.Get("Content-Type"))
-		http.Error(w, "content type must be application/json", http.StatusBadRequest)
+		err = fmt.Errorf("content type: %s: %w", r.Header.Get("Content-Type"), core_errors.ErrInvalidContentType)
+		rh.HandleError(fmt.Errorf(""))
 		return
 	}
 
@@ -50,8 +53,7 @@ func (h *ProductHandler) PatchProduct(w http.ResponseWriter, r *http.Request) {
 
 	err = dec.Decode(&productRequest)
 	if err != nil {
-		slog.Warn("invalid request body", "error", err)
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		rh.HandleError(fmt.Errorf("invalid request body: %w: %v", core_errors.ErrInvalidRequestBody, err))
 		return
 	}
 
@@ -59,33 +61,11 @@ func (h *ProductHandler) PatchProduct(w http.ResponseWriter, r *http.Request) {
 
 	productDomain, err := h.service.PatchProduct(r.Context(), productID, productPatch)
 	if err != nil {
-		switch {
-		case errors.Is(err, core_errors.ErrNotFound):
-			slog.Warn("product not found", "error", err)
-			http.Error(w, "product not found", http.StatusNotFound)
-		case errors.Is(err, core_errors.ErrNullNotAllowed):
-			slog.Warn("argument can not be null", "error", err)
-			http.Error(w, "argument can not be null", http.StatusBadRequest)
-		case errors.Is(err, core_errors.ErrInvalidName):
-			slog.Warn("invalid name", "error", err)
-			http.Error(w, "invalid name", http.StatusBadRequest)
-		case errors.Is(err, core_errors.ErrInvalidPrice):
-			slog.Warn("invalid price", "error", err)
-			http.Error(w, "invalid price", http.StatusBadRequest)
-		default:
-			slog.Error("patch product", "error", err)
-			http.Error(w, "internal error", http.StatusInternalServerError)
-		}
+		rh.HandleError(err)
 		return
 	}
 
 	productResponse := PatchProductResponse(ToDTO(productDomain))
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	err = json.NewEncoder(w).Encode(productResponse)
-	if err != nil {
-		slog.Error("encode product response", "error", err)
-	}
+	rh.SendResponse(http.StatusOK, productResponse)
 }
