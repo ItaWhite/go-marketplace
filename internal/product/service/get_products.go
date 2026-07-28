@@ -9,10 +9,10 @@ import (
 
 func (s *ProductService) GetProducts(ctx context.Context, limit, offset int) ([]domain.Product, error) {
 	if limit < 0 {
-		return nil, fmt.Errorf("limit is negative: %w", core_errors.ErrInvalidArgument)
+		return nil, fmt.Errorf("limit is negative: %w", core_errors.ErrInvalidQueryParam)
 	}
 	if offset < 0 {
-		return nil, fmt.Errorf("offset is negative: %w", core_errors.ErrInvalidArgument)
+		return nil, fmt.Errorf("offset is negative: %w", core_errors.ErrInvalidQueryParam)
 	}
 
 	products, err := s.repo.GetProducts(ctx, limit, offset)
