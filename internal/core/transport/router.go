@@ -1,7 +1,7 @@
 package transport
 
 import (
-	"go-marketplace/internal/product/handler"
+	"go-marketplace/internal/features/products/handler"
 	"net/http"
 )
 
