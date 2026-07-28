@@ -2,10 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"go-marketplace/internal/core/domain"
+	"go-marketplace/internal/core/logger"
 	"go-marketplace/internal/core/transport/errors"
-	"log/slog"
+	"go-marketplace/internal/core/transport/response"
 	"net/http"
 	"strings"
 )
@@ -27,9 +28,11 @@ func toDomain(dto PostProductRequest) domain.Product {
 }
 
 func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
+	logger := core_logger.FromContext(r.Context())
+	rh := response.NewResponseHandler(logger, w)
+
 	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
-		slog.Warn("invalid content type", "content_type", r.Header.Get("Content-Type"))
-		http.Error(w, "content type must be application/json", http.StatusBadRequest)
+		rh.HandleError(fmt.Errorf("content type: %s: %w", r.Header.Get("Content-Type"), core_errors.ErrInvalidContentType))
 		return
 	}
 
@@ -42,8 +45,7 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 
 	err := dec.Decode(&productRequest)
 	if err != nil {
-		slog.Warn("invalid request body", "error", err)
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		rh.HandleError(fmt.Errorf("invalid request body: %w: %v", core_errors.ErrInvalidRequestBody, err))
 		return
 	}
 
@@ -51,27 +53,11 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 
 	productDomain, err = h.service.CreateProduct(r.Context(), productDomain)
 	if err != nil {
-		switch {
-		case errors.Is(err, core_errors.ErrInvalidName):
-			slog.Warn("invalid name", "error", err)
-			http.Error(w, "invalid name", http.StatusBadRequest)
-		case errors.Is(err, core_errors.ErrInvalidPrice):
-			slog.Warn("invalid price", "error", err)
-			http.Error(w, "invalid price", http.StatusBadRequest)
-		default:
-			slog.Error("create product", "error", err)
-			http.Error(w, "internal error", http.StatusInternalServerError)
-		}
+		rh.HandleError(err)
 		return
 	}
 
 	productResponse := PostProductResponse(ToDTO(productDomain))
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-
-	err = json.NewEncoder(w).Encode(productResponse)
-	if err != nil {
-		slog.Error("encode product response", "error", err)
-	}
+	rh.SendResponse(http.StatusCreated, productResponse)
 }

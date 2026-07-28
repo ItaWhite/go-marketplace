@@ -1,36 +1,28 @@
 package handler
 
 import (
-	"errors"
-	"go-marketplace/internal/core/transport/errors"
+	"fmt"
+	"go-marketplace/internal/core/logger"
+	"go-marketplace/internal/core/transport/response"
 	"go-marketplace/internal/core/transport/utils"
-	"log/slog"
 	"net/http"
 )
 
 func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+	logger := core_logger.FromContext(r.Context())
+	rh := response.NewResponseHandler(logger, w)
+
 	productID, err := utils.GetPathValue(r, "id")
 	if err != nil {
-		slog.Warn("get path value", "error", err)
-		http.Error(w, "invalid id", http.StatusBadRequest)
+		rh.HandleError(fmt.Errorf("get path value: %w", err))
 		return
 	}
 
 	err = h.service.DeleteProduct(r.Context(), productID)
 	if err != nil {
-		switch {
-		case errors.Is(err, core_errors.ErrInvalidID):
-			slog.Warn("invalid id", "error", err)
-			http.Error(w, "invalid product id", http.StatusBadRequest)
-		case errors.Is(err, core_errors.ErrNotFound):
-			slog.Warn("product not found", "error", err)
-			http.Error(w, "product not found", http.StatusNotFound)
-		default:
-			slog.Error("delete product", "error", err)
-			http.Error(w, "internal error", http.StatusInternalServerError)
-		}
+		rh.HandleError(err)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	rh.SendResponse(http.StatusNoContent, nil)
 }
