@@ -16,5 +16,6 @@ func NewUserHandler(s *service.UserService) *UserHandler {
 }
 
 func (h *UserHandler) RegisterRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("GET /users", h.GetUsers)
 	mux.HandleFunc("POST /users", h.PostUser)
 }
