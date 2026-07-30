@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"go-marketplace/internal/core/logger"
 	"go-marketplace/internal/core/storage"
-	"go-marketplace/internal/core/transport"
 	"go-marketplace/internal/core/transport/middleware"
-	"go-marketplace/internal/features/products/handler"
-	"go-marketplace/internal/features/products/repository"
-	"go-marketplace/internal/features/products/service"
+	products_handler "go-marketplace/internal/features/products/handler"
+	products_repository "go-marketplace/internal/features/products/repository"
+	products_service "go-marketplace/internal/features/products/service"
+	users_handler "go-marketplace/internal/features/users/handler"
+	users_repository "go-marketplace/internal/features/users/repository"
+	users_service "go-marketplace/internal/features/users/service"
 	"log"
 	"log/slog"
 	"net/http"
@@ -39,13 +41,19 @@ func main() {
 	}
 	defer db.Close()
 
-	productRepository := repository.NewProductRepository(db)
-	productService := service.NewProductService(productRepository)
-	productHandler := handler.NewProductHandler(productService)
+	productRepository := products_repository.NewProductRepository(db)
+	productService := products_service.NewProductService(productRepository)
+	productHandler := products_handler.NewProductHandler(productService)
 
-	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
+	userRepository := users_repository.NewUserRepository(db)
+	userService := users_service.NewUserService(userRepository)
+	userHandler := users_handler.NewUserHandler(userService)
 
-	mux := transport.Router(productHandler)
+	mux := http.NewServeMux()
+
+	productHandler.RegisterRoutes(mux)
+	userHandler.RegisterRoutes(mux)
+
 	chain := middleware.Chain(
 		middleware.RequestID,
 		middleware.Logger,
@@ -56,6 +64,8 @@ func main() {
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS12,
 	}
+
+	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 
 	s := http.Server{
 		Addr:         addr,
