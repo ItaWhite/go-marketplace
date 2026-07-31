@@ -26,3 +26,9 @@ func (r UserRole) IsValid() bool {
 		return false
 	}
 }
+
+type UserPatch struct {
+	Name  Nullable[string]
+	Phone Nullable[string]
+	Role  Nullable[string]
+}
