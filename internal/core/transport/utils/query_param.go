@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"go-marketplace/internal/core/transport/errors"
+	"go-marketplace/internal/core/errors"
 	"net/http"
 	"strconv"
 )

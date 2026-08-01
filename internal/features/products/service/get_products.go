@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go-marketplace/internal/core/domain"
-	"go-marketplace/internal/core/transport/errors"
+	"go-marketplace/internal/core/errors"
 )
 
 func (s *ProductService) GetProducts(ctx context.Context, limit, offset int) ([]domain.Product, error) {

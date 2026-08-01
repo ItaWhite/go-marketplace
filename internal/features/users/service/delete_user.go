@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
-	"go-marketplace/internal/core/transport/errors"
+	"go-marketplace/internal/core/errors"
 )
 
 func (s *UserService) DeleteUser(ctx context.Context, id int) error {
