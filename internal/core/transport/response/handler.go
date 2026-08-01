@@ -61,6 +61,14 @@ func (h *ResponseHandler) HandleError(err error) {
 		msg = core_errors.ErrInvalidPrice.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrInvalidPhone):
+		msg = core_errors.ErrInvalidPhone.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrInvalidRole):
+		msg = core_errors.ErrInvalidRole.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
 	case errors.Is(err, core_errors.ErrNotFound):
 		msg = core_errors.ErrNotFound.Error()
 		h.logger.Warn(msg, "error", err)

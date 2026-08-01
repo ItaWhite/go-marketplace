@@ -7,6 +7,8 @@ var (
 	ErrInvalidID          = errors.New("invalid id")
 	ErrInvalidName        = errors.New("invalid name")
 	ErrInvalidPrice       = errors.New("invalid price")
+	ErrInvalidPhone       = errors.New("invalid phone")
+	ErrInvalidRole        = errors.New("invalid role")
 	ErrNotFound           = errors.New("not found")
 	ErrInvalidContentType = errors.New("invalid content type")
 	ErrInvalidRequestBody = errors.New("invalid request body")
