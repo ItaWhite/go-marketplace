@@ -67,17 +67,30 @@ func main() {
 
 	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 
+	readTimeout, err := time.ParseDuration(os.Getenv("SERVER_READ_TIMEOUT"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	writeTimeout, err := time.ParseDuration(os.Getenv("SERVER_WRITE_TIMEOUT"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	idleTimeout, err := time.ParseDuration(os.Getenv("SERVER_IDLE_TIMEOUT"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	s := http.Server{
 		Addr:         addr,
 		Handler:      chain(mux),
 		TLSConfig:    tlsConfig,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  60 * time.Second,
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writeTimeout,
+		IdleTimeout:  idleTimeout,
 	}
 
-	cert := "cmd/api/cert.pem"
-	key := "cmd/api/key.pem"
+	cert := os.Getenv("TLS_CERT_PATH")
+	key := os.Getenv("TLS_KEY_PATH")
 
 	go func() {
 		fmt.Printf("Server started at port %s...\n", os.Getenv("SERVER_PORT"))
