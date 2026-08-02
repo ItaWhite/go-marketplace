@@ -15,6 +15,7 @@ type PostProductRequest struct {
 	Name        string  `json:"name"`
 	Description *string `json:"description"`
 	Price       int     `json:"price"`
+	SellerID    int     `json:"seller_id"`
 }
 
 type PostProductResponse ProductResponse
@@ -24,6 +25,7 @@ func toDomain(dto PostProductRequest) domain.Product {
 		Name:        dto.Name,
 		Description: dto.Description,
 		Price:       dto.Price,
+		SellerID:    dto.SellerID,
 	}
 }
 
@@ -57,7 +59,7 @@ func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	productResponse := PostProductResponse(ToDTO(productDomain))
+	productResponse := PostProductResponse(toDTO(productDomain))
 
 	rh.SendResponse(http.StatusCreated, productResponse)
 }
