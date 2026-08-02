@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go-marketplace/internal/core/transport/errors"
+	"go-marketplace/internal/core/errors"
 	"log/slog"
 	"net/http"
 )

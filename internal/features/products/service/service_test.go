@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"go-marketplace/internal/core/domain"
-	"go-marketplace/internal/core/transport/errors"
+	"go-marketplace/internal/core/errors"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

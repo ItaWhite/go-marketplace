@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"go-marketplace/internal/core/domain"
-	"go-marketplace/internal/core/transport/errors"
+	"go-marketplace/internal/core/errors"
 
 	"github.com/jackc/pgx/v5"
 )

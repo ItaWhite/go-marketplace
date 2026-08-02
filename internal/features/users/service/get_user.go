@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go-marketplace/internal/core/domain"
-	"go-marketplace/internal/core/transport/errors"
+	"go-marketplace/internal/core/errors"
 )
 
 func (s *UserService) GetUser(ctx context.Context, id int) (domain.User, error) {
