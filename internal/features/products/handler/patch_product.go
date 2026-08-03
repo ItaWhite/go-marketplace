@@ -34,13 +34,13 @@ func (h *ProductHandler) PatchProduct(w http.ResponseWriter, r *http.Request) {
 
 	productID, err := utils.GetPathValue(r, "id")
 	if err != nil {
-		rh.HandleError(fmt.Errorf("get path value: %w", err))
+		rh.HandleError(fmt.Errorf("id param: %w", err))
 		return
 	}
 
 	if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
 		err = fmt.Errorf("content type: %s: %w", r.Header.Get("Content-Type"), core_errors.ErrInvalidContentType)
-		rh.HandleError(fmt.Errorf(""))
+		rh.HandleError(err)
 		return
 	}
 
@@ -65,7 +65,7 @@ func (h *ProductHandler) PatchProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	productResponse := PatchProductResponse(ToDTO(productDomain))
+	productResponse := PatchProductResponse(toDTO(productDomain))
 
 	rh.SendResponse(http.StatusOK, productResponse)
 }
