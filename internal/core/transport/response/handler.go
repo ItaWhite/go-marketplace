@@ -57,6 +57,10 @@ func (h *ResponseHandler) HandleError(err error) {
 		msg = core_errors.ErrInvalidName.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrInvalidDescription):
+		msg = core_errors.ErrInvalidDescription.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
 	case errors.Is(err, core_errors.ErrInvalidPrice):
 		msg = core_errors.ErrInvalidPrice.Error()
 		h.logger.Warn(msg, "error", err)
@@ -71,6 +75,10 @@ func (h *ResponseHandler) HandleError(err error) {
 		code = http.StatusBadRequest
 	case errors.Is(err, core_errors.ErrNotFound):
 		msg = core_errors.ErrNotFound.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusNotFound
+	case errors.Is(err, core_errors.ErrForeignKeyViolation):
+		msg = core_errors.ErrForeignKeyViolation.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusNotFound
 	case errors.Is(err, core_errors.ErrInvalidContentType):
