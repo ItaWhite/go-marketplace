@@ -14,7 +14,7 @@ func (h *ProductHandler) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	productID, err := utils.GetPathValue(r, "id")
 	if err != nil {
-		rh.HandleError(fmt.Errorf("get path value: %w", err))
+		rh.HandleError(fmt.Errorf("id param: %w", err))
 		return
 	}
 
