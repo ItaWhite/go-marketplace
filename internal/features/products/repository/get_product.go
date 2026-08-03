@@ -11,27 +11,20 @@ import (
 )
 
 func (r *productRepository) GetProduct(ctx context.Context, id int) (domain.Product, error) {
-	row := r.db.QueryRow(ctx, "select id, version, name, description, price, created_at from products where id = $1", id)
+	row := r.db.QueryRow(ctx, "select id, version, name, description, price, created_at, seller_id from products where id = $1", id)
 
-	var product ProductModel
+	var productModel ProductModel
 
-	err := row.Scan(&product.ID, &product.Version, &product.Name, &product.Description, &product.Price, &product.CreatedAt)
+	err := row.Scan(&productModel.ID, &productModel.Version, &productModel.Name, &productModel.Description, &productModel.Price, &productModel.CreatedAt, &productModel.SellerID)
 	if err != nil {
-		switch {
-		case errors.Is(err, pgx.ErrNoRows):
+		if errors.Is(err, pgx.ErrNoRows) {
 			return domain.Product{}, fmt.Errorf("product with id=%d not found: %w", id, core_errors.ErrNotFound)
 		}
-		return domain.Product{}, err
+
+		return domain.Product{}, fmt.Errorf("scan error: %w", err)
 	}
 
-	productDomain := domain.Product{
-		ID:          product.ID,
-		Version:     product.Version,
-		Name:        product.Name,
-		Description: product.Description,
-		Price:       product.Price,
-		CreatedAt:   product.CreatedAt,
-	}
+	productDomain := toDomain(productModel)
 
 	return productDomain, nil
 }
