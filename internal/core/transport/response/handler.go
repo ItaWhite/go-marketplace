@@ -77,6 +77,10 @@ func (h *ResponseHandler) HandleError(err error) {
 		msg = core_errors.ErrNotFound.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusNotFound
+	case errors.Is(err, core_errors.ErrConflict):
+		msg = core_errors.ErrConflict.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusConflict
 	case errors.Is(err, core_errors.ErrForeignKeyViolation):
 		msg = core_errors.ErrForeignKeyViolation.Error()
 		h.logger.Warn(msg, "error", err)
