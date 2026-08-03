@@ -15,7 +15,7 @@ func toDTOs(domains []domain.Product) []ProductResponse {
 	dtos := make([]ProductResponse, len(domains))
 
 	for i, d := range domains {
-		dtos[i] = ToDTO(d)
+		dtos[i] = toDTO(d)
 	}
 
 	return dtos
@@ -24,6 +24,12 @@ func toDTOs(domains []domain.Product) []ProductResponse {
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)
+
+	sellerID, err := utils.GetQueryParam(r, "seller_id")
+	if err != nil {
+		rh.HandleError(fmt.Errorf("seller_id: %w", err))
+		return
+	}
 
 	limit, err := utils.GetQueryParam(r, "limit")
 	if err != nil {
@@ -37,13 +43,13 @@ func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	productDomainsList, err := h.service.GetProducts(r.Context(), limit, offset)
+	productDomains, err := h.service.GetProducts(r.Context(), sellerID, limit, offset)
 	if err != nil {
 		rh.HandleError(err)
 		return
 	}
 
-	productsResponse := GetProductsResponse(toDTOs(productDomainsList))
+	productsResponse := GetProductsResponse(toDTOs(productDomains))
 
 	rh.SendResponse(http.StatusOK, productsResponse)
 }

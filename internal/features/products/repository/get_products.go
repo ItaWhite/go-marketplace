@@ -6,54 +6,54 @@ import (
 	"go-marketplace/internal/core/domain"
 )
 
-func (r *productRepository) GetProducts(ctx context.Context, limit, offset int) ([]domain.Product, error) {
-	query := "select id, version, name, description, price, created_at  from products order by id"
+func (r *productRepository) GetProducts(ctx context.Context, sellerID, limit, offset *int) ([]domain.Product, error) {
+	query := "select id, version, name, description, price, created_at, seller_id from products"
 
 	var args []any
 
-	if limit != 0 {
-		args = append(args, limit)
+	if sellerID != nil {
+		args = append(args, *sellerID)
+		query += fmt.Sprintf(" where seller_id = $%d", len(args))
+	}
+
+	query += " order by id"
+
+	if limit != nil {
+		args = append(args, *limit)
 		query += fmt.Sprintf(" limit $%d", len(args))
 	}
-	if offset != 0 {
-		args = append(args, offset)
+	if offset != nil {
+		args = append(args, *offset)
 		query += fmt.Sprintf(" offset $%d", len(args))
 	}
 
 	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
-		return []domain.Product{}, fmt.Errorf("error select: %w", err)
+		return nil, fmt.Errorf("error select: %w", err)
 	}
 	defer rows.Close()
 
-	var productList []ProductModel
+	var productModels []ProductModel
 
 	for rows.Next() {
 		var product ProductModel
 
-		err = rows.Scan(&product.ID, &product.Version, &product.Name, &product.Description, &product.Price, &product.CreatedAt)
+		err = rows.Scan(&product.ID, &product.Version, &product.Name, &product.Description, &product.Price, &product.CreatedAt, &product.SellerID)
 		if err != nil {
 			return nil, fmt.Errorf("error scan: %w", err)
 		}
 
-		productList = append(productList, product)
+		productModels = append(productModels, product)
 	}
 	if rows.Err() != nil {
-		return nil, fmt.Errorf("rows next error: %w", err)
+		return nil, fmt.Errorf("rows next error: %w", rows.Err())
 	}
 
-	productDomainsList := make([]domain.Product, len(productList))
+	productDomains := make([]domain.Product, len(productModels))
 
-	for i, m := range productList {
-		productDomainsList[i] = domain.Product{
-			ID:          m.ID,
-			Version:     m.Version,
-			Name:        m.Name,
-			Description: m.Description,
-			Price:       m.Price,
-			CreatedAt:   m.CreatedAt,
-		}
+	for i, m := range productModels {
+		productDomains[i] = toDomain(m)
 	}
 
-	return productDomainsList, nil
+	return productDomains, nil
 }
