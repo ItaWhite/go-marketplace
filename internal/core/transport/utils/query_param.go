@@ -7,16 +7,16 @@ import (
 	"strconv"
 )
 
-func GetQueryParam(r *http.Request, key string) (int, error) {
+func GetQueryParam(r *http.Request, key string) (*int, error) {
 	valueStr := r.URL.Query().Get(key)
 	if valueStr == "" {
-		return 0, nil
+		return nil, nil
 	}
 
 	value, err := strconv.Atoi(valueStr)
 	if err != nil {
-		return 0, fmt.Errorf("param %s is not integer: %v: %w", valueStr, err, core_errors.ErrInvalidQueryParam)
+		return nil, fmt.Errorf("param %s=%s: %v: %w", key, valueStr, err, core_errors.ErrInvalidQueryParam)
 	}
 
-	return value, nil
+	return &value, nil
 }
