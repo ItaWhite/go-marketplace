@@ -20,4 +20,5 @@ func (h *UserHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /users/{id}", h.GetUser)
 	mux.HandleFunc("POST /users", h.PostUser)
 	mux.HandleFunc("PATCH /users/{id}", h.PatchUser)
+	mux.HandleFunc("DELETE /users/{id}", h.DeleteUser)
 }
