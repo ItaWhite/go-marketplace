@@ -16,7 +16,7 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 
 	productID, err := utils.GetPathValue(r, "id")
 	if err != nil {
-		rh.HandleError(fmt.Errorf("get path value: %w", err))
+		rh.HandleError(fmt.Errorf("id param: %w", err))
 		return
 	}
 
@@ -26,7 +26,7 @@ func (h *ProductHandler) GetProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	productResponse := GetProductResponse(ToDTO(productDomain))
+	productResponse := GetProductResponse(toDTO(productDomain))
 
 	rh.SendResponse(http.StatusOK, productResponse)
 }

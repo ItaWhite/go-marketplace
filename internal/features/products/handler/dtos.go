@@ -12,9 +12,10 @@ type ProductResponse struct {
 	Description *string   `json:"description"`
 	Price       int       `json:"price"`
 	CreatedAt   time.Time `json:"created_at"`
+	SellerID    int       `json:"seller_id"`
 }
 
-func ToDTO(domain domain.Product) ProductResponse {
+func toDTO(domain domain.Product) ProductResponse {
 	return ProductResponse{
 		ID:          domain.ID,
 		Version:     domain.Version,
@@ -22,5 +23,6 @@ func ToDTO(domain domain.Product) ProductResponse {
 		Description: domain.Description,
 		Price:       domain.Price,
 		CreatedAt:   domain.CreatedAt,
+		SellerID:    domain.SellerID,
 	}
 }

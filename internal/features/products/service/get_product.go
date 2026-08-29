@@ -9,7 +9,7 @@ import (
 
 func (s *ProductService) GetProduct(ctx context.Context, id int) (domain.Product, error) {
 	if id <= 0 {
-		return domain.Product{}, core_errors.ErrInvalidID
+		return domain.Product{}, fmt.Errorf("invalid id=%d: %w", id, core_errors.ErrInvalidID)
 	}
 
 	product, err := s.repo.GetProduct(ctx, id)

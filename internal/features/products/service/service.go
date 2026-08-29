@@ -6,7 +6,7 @@ import (
 )
 
 type ProductRepository interface {
-	GetProducts(ctx context.Context, limit, offset int) ([]domain.Product, error)
+	GetProducts(ctx context.Context, sellerID, limit, offset *int) ([]domain.Product, error)
 	GetProduct(ctx context.Context, id int) (domain.Product, error)
 	CreateProduct(ctx context.Context, product domain.Product) (domain.Product, error)
 	PatchProduct(ctx context.Context, id int, productPatch domain.ProductPatch) (domain.Product, error)

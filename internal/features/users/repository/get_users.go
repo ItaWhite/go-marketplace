@@ -6,17 +6,17 @@ import (
 	"go-marketplace/internal/core/domain"
 )
 
-func (r *userRepository) GetUsers(ctx context.Context, limit, offset int) ([]domain.User, error) {
+func (r *userRepository) GetUsers(ctx context.Context, limit, offset *int) ([]domain.User, error) {
 	query := "select id, version, name, phone, role, created_at from users order by id"
 
 	var args []any
 
-	if limit != 0 {
-		args = append(args, limit)
+	if limit != nil {
+		args = append(args, *limit)
 		query += fmt.Sprintf(" limit $%d", len(args))
 	}
-	if offset != 0 {
-		args = append(args, offset)
+	if offset != nil {
+		args = append(args, *offset)
 		query += fmt.Sprintf(" offset $%d", len(args))
 	}
 
@@ -45,14 +45,7 @@ func (r *userRepository) GetUsers(ctx context.Context, limit, offset int) ([]dom
 	userDomainsList := make([]domain.User, len(usersList))
 
 	for i, m := range usersList {
-		userDomainsList[i] = domain.User{
-			ID:        m.ID,
-			Version:   m.Version,
-			Name:      m.Name,
-			Phone:     m.Phone,
-			Role:      domain.UserRole(m.Role),
-			CreatedAt: m.CreatedAt,
-		}
+		userDomainsList[i] = toDomain(m)
 	}
 
 	return userDomainsList, nil

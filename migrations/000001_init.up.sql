@@ -13,5 +13,7 @@ create table if not exists products (
     name varchar(50) not null check ( char_length(name) between 3 and 50),
     description text,
     price int not null check ( price > 0 ),
-    created_at timestamptz not null default now()
+    created_at timestamptz not null default now(),
+
+    seller_id int not null references users(id) on delete restrict
 );

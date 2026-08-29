@@ -5,12 +5,13 @@ import (
 )
 
 type Product struct {
-	ID          int       `json:"id"`
-	Version     int64     `json:"version"`
-	Name        string    `json:"name"`
-	Description *string   `json:"description"`
-	Price       int       `json:"price"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID          int
+	Version     int64
+	Name        string
+	Description *string
+	Price       int
+	CreatedAt   time.Time
+	SellerID    int
 }
 
 type ProductPatch struct {

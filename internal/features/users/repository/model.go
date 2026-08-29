@@ -1,6 +1,9 @@
 package repository
 
-import "time"
+import (
+	"go-marketplace/internal/core/domain"
+	"time"
+)
 
 type UserModel struct {
 	ID        int
@@ -9,4 +12,15 @@ type UserModel struct {
 	Phone     *string
 	Role      string
 	CreatedAt time.Time
+}
+
+func toDomain(model UserModel) domain.User {
+	return domain.User{
+		ID:        model.ID,
+		Version:   model.Version,
+		Name:      model.Name,
+		Phone:     model.Phone,
+		Role:      domain.UserRole(model.Role),
+		CreatedAt: model.CreatedAt,
+	}
 }

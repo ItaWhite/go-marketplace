@@ -38,19 +38,12 @@ func (r *userRepository) PatchUser(ctx context.Context, id int, userPatch domain
 	err = row.Scan(&userModel.Version)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return domain.User{}, fmt.Errorf("user with id=%d accessed from several requests: %w", id, core_errors.ErrNotFound)
+			return domain.User{}, fmt.Errorf("user with id=%d accessed from several requests: %w", id, core_errors.ErrConflict)
 		}
 		return domain.User{}, fmt.Errorf("scan error: %w", err)
 	}
 
-	userDomain := domain.User{
-		ID:        userModel.ID,
-		Version:   userModel.Version,
-		Name:      userModel.Name,
-		Phone:     userModel.Phone,
-		Role:      domain.UserRole(userModel.Role),
-		CreatedAt: userModel.CreatedAt,
-	}
+	userDomain := toDomain(userModel)
 
 	return userDomain, nil
 }
