@@ -45,14 +45,7 @@ func (r *userRepository) GetUsers(ctx context.Context, limit, offset *int) ([]do
 	userDomainsList := make([]domain.User, len(usersList))
 
 	for i, m := range usersList {
-		userDomainsList[i] = domain.User{
-			ID:        m.ID,
-			Version:   m.Version,
-			Name:      m.Name,
-			Phone:     m.Phone,
-			Role:      domain.UserRole(m.Role),
-			CreatedAt: m.CreatedAt,
-		}
+		userDomainsList[i] = toDomain(m)
 	}
 
 	return userDomainsList, nil

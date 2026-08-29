@@ -23,14 +23,7 @@ func (r *userRepository) GetUser(ctx context.Context, id int) (domain.User, erro
 		return domain.User{}, fmt.Errorf("get user query: %w", err)
 	}
 
-	userDomain := domain.User{
-		ID:        userModel.ID,
-		Version:   userModel.Version,
-		Name:      userModel.Name,
-		Phone:     userModel.Phone,
-		Role:      domain.UserRole(userModel.Role),
-		CreatedAt: userModel.CreatedAt,
-	}
+	userDomain := toDomain(userModel)
 
 	return userDomain, nil
 }

@@ -43,14 +43,7 @@ func (r *userRepository) PatchUser(ctx context.Context, id int, userPatch domain
 		return domain.User{}, fmt.Errorf("scan error: %w", err)
 	}
 
-	userDomain := domain.User{
-		ID:        userModel.ID,
-		Version:   userModel.Version,
-		Name:      userModel.Name,
-		Phone:     userModel.Phone,
-		Role:      domain.UserRole(userModel.Role),
-		CreatedAt: userModel.CreatedAt,
-	}
+	userDomain := toDomain(userModel)
 
 	return userDomain, nil
 }
