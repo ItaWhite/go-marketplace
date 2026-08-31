@@ -17,3 +17,18 @@ create table if not exists products (
 
     seller_id int not null references users(id) on delete restrict
 );
+
+create table if not exists credentials (
+    user_id int primary key references users(id) on delete cascade,
+    login varchar(15) not null unique,
+    password_hash text not null
+);
+
+create table if not exists refresh_tokens (
+    id int generated always as identity primary key,
+    user_id int not null references users(id) on delete cascade,
+    token_hash text not null unique,
+    expires_at timestamptz not null,
+    created_at timestamptz not null default now(),
+    revoked_at timestamptz
+);
