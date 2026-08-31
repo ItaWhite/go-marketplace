@@ -17,4 +17,6 @@ var (
 	ErrInvalidRequestBody  = errors.New("invalid request body")
 	ErrInvalidPathValue    = errors.New("invalid path value")
 	ErrInvalidQueryParam   = errors.New("invalid query param")
+	ErrInvalidLogin        = errors.New("invalid login")
+	ErrInvalidPassword     = errors.New("invalid password")
 )
