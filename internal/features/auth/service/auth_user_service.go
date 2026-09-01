@@ -1,0 +1,36 @@
+package service
+
+import (
+	"context"
+	"go-marketplace/internal/core/domain"
+
+	users_service "go-marketplace/internal/features/users/service"
+)
+
+type AuthUserService struct {
+	users *users_service.UserService
+}
+
+func NewAuthUserService(users *users_service.UserService) *AuthUserService {
+	return &AuthUserService{
+		users: users,
+	}
+}
+
+type CreateUserInput struct {
+	Name  string
+	Phone *string
+}
+
+func (c *AuthUserService) Create(ctx context.Context, input CreateUserInput) (int, string, error) {
+	user, err := c.users.CreateUser(ctx, domain.User{
+		Name:  input.Name,
+		Phone: input.Phone,
+		Role:  domain.UserBuyer,
+	})
+	if err != nil {
+		return 0, "", err
+	}
+
+	return user.ID, string(user.Role), nil
+}
