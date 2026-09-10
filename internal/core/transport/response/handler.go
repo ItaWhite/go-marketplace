@@ -101,6 +101,14 @@ func (h *ResponseHandler) HandleError(err error) {
 		msg = core_errors.ErrInvalidQueryParam.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrInvalidLogin):
+		msg = core_errors.ErrInvalidLogin.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrInvalidPassword):
+		msg = core_errors.ErrInvalidPassword.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
 	default:
 		msg = "internal server error"
 		h.logger.Error(msg, "error", err)
