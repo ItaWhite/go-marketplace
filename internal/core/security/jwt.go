@@ -1,12 +1,27 @@
 package security
 
 import (
+	"context"
 	"crypto/rsa"
 	"fmt"
-	"go-marketplace/internal/core/errors"
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+const (
+	UserIDKey = "user_id"
+	RoleKey   = "user_role"
+)
+
+func UserIDFromContext(ctx context.Context) (int, bool) {
+	userID, ok := ctx.Value(UserIDKey).(int)
+	return userID, ok
+}
+
+func UserRoleFromContext(ctx context.Context) (string, bool) {
+	role, ok := ctx.Value(RoleKey).(string)
+	return role, ok
+}
 
 type JWTValidator struct {
 	publicKey *rsa.PublicKey
@@ -38,7 +53,7 @@ func (v *JWTValidator) Validate(tokenString string) (AccessClaims, error) {
 		jwt.WithIssuer(v.issuer),
 	)
 	if err != nil || !token.Valid {
-		return AccessClaims{}, core_errors.ErrInvalidToken
+		return AccessClaims{}, fmt.Errorf("invalid token")
 	}
 
 	return claims, nil

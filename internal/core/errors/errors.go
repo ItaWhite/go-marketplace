@@ -19,5 +19,5 @@ var (
 	ErrInvalidQueryParam   = errors.New("invalid query param")
 	ErrInvalidLogin        = errors.New("invalid login")
 	ErrInvalidPassword     = errors.New("invalid password")
-	ErrInvalidToken        = errors.New("invalid token")
+	ErrUnauthorized        = errors.New("unauthorized")
 )
