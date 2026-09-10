@@ -5,9 +5,12 @@ import (
 	"go-marketplace/internal/core/domain"
 )
 
-type AuthRepository interface {
-	CreateCredentials(ctx context.Context, credentials domain.Credentials) error
+type TokenRepository interface {
 	CreateRefreshToken(ctx context.Context, token domain.RefreshToken) error
+}
+
+type CredentialsRepository interface {
+	CreateCredentials(ctx context.Context, credentials domain.Credentials) error
 }
 
 type UserService interface {
@@ -15,15 +18,17 @@ type UserService interface {
 }
 
 type AuthService struct {
-	repo   AuthRepository
-	users  UserService
-	tokens *TokenService
+	tokenRepo    TokenRepository
+	credRepo     CredentialsRepository
+	userService  UserService
+	tokenService *TokenService
 }
 
-func NewAuthService(repo AuthRepository, userService UserService, tokenService *TokenService) *AuthService {
+func NewAuthService(tokenRepo TokenRepository, credRepo CredentialsRepository, userService UserService, tokenService *TokenService) *AuthService {
 	return &AuthService{
-		repo:   repo,
-		users:  userService,
-		tokens: tokenService,
+		tokenRepo:    tokenRepo,
+		credRepo:     credRepo,
+		userService:  userService,
+		tokenService: tokenService,
 	}
 }

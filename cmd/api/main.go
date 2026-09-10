@@ -76,7 +76,7 @@ func main() {
 	authUserService := auth_service.NewAuthUserService(userService)
 
 	authRepository := auth_repository.NewAuthRepository(db)
-	authService := auth_service.NewAuthService(authRepository, authUserService, tokenService)
+	authService := auth_service.NewAuthService(authRepository, authRepository, authUserService, tokenService)
 	authHandler := auth_handler.NewAuthHandler(authService)
 
 	mux := http.NewServeMux()

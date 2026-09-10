@@ -23,7 +23,7 @@ func (s *AuthService) Register(ctx context.Context, input RegisterInput) (domain
 		return domain.TokenPair{}, fmt.Errorf("register with password=%s: %w", input.Login, core_errors.ErrInvalidPassword)
 	}
 
-	userID, userRole, err := s.users.Create(ctx, CreateUserInput{
+	userID, userRole, err := s.userService.Create(ctx, CreateUserInput{
 		Name:  input.Name,
 		Phone: input.Phone,
 	})
@@ -42,17 +42,17 @@ func (s *AuthService) Register(ctx context.Context, input RegisterInput) (domain
 		Login:        input.Login,
 	}
 
-	err = s.repo.CreateCredentials(ctx, credentials)
+	err = s.credRepo.CreateCredentials(ctx, credentials)
 	if err != nil {
 		return domain.TokenPair{}, fmt.Errorf("register: %w", err)
 	}
 
-	accessTokenStr, err := s.tokens.GenerateAccessToken(userID, userRole)
+	accessTokenStr, err := s.tokenService.GenerateAccessToken(userID, userRole)
 	if err != nil {
 		return domain.TokenPair{}, fmt.Errorf("generate access token: %w", err)
 	}
 
-	refreshTokenStr, expiresAt, err := s.tokens.GenerateRefreshToken()
+	refreshTokenStr, expiresAt, err := s.tokenService.GenerateRefreshToken()
 	if err != nil {
 		return domain.TokenPair{}, fmt.Errorf("generate refresh token: %w", err)
 	}
@@ -64,7 +64,7 @@ func (s *AuthService) Register(ctx context.Context, input RegisterInput) (domain
 		RevokedAt: nil,
 	}
 
-	err = s.repo.CreateRefreshToken(ctx, refreshToken)
+	err = s.tokenRepo.CreateRefreshToken(ctx, refreshToken)
 	if err != nil {
 		return domain.TokenPair{}, fmt.Errorf("create refresh token: %w", err)
 	}
