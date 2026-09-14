@@ -57,6 +57,6 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := toDTO(pair)
-	rh.SendResponse(http.StatusCreated, response)
+	resp := toDTO(pair)
+	rh.SendResponse(http.StatusCreated, resp)
 }
