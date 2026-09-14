@@ -13,6 +13,7 @@ type RegisterInput struct {
 	Phone    *string
 	Login    string
 	Password string
+	Role     string
 }
 
 func (s *AuthService) Register(ctx context.Context, input RegisterInput) (domain.TokenPair, error) {
@@ -26,6 +27,7 @@ func (s *AuthService) Register(ctx context.Context, input RegisterInput) (domain
 	userID, userRole, err := s.userService.Create(ctx, CreateUserInput{
 		Name:  input.Name,
 		Phone: input.Phone,
+		Role:  input.Role,
 	})
 	if err != nil {
 		return domain.TokenPair{}, fmt.Errorf("create user: %w", err)

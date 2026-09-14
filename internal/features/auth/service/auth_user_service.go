@@ -20,13 +20,14 @@ func NewAuthUserService(users *users_service.UserService) *AuthUserService {
 type CreateUserInput struct {
 	Name  string
 	Phone *string
+	Role  string
 }
 
 func (c *AuthUserService) Create(ctx context.Context, input CreateUserInput) (int, string, error) {
 	user, err := c.users.CreateUser(ctx, domain.User{
 		Name:  input.Name,
 		Phone: input.Phone,
-		Role:  domain.UserBuyer,
+		Role:  domain.UserRole(input.Role),
 	})
 	if err != nil {
 		return 0, "", err

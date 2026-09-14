@@ -17,6 +17,7 @@ type RegisterRequest struct {
 	Phone    *string `json:"phone"`
 	Login    string  `json:"login"`
 	Password string  `json:"password"`
+	Role     string  `json:"role"`
 }
 
 type RegisterResponse struct {
@@ -30,6 +31,7 @@ func toRegisterInput(dto RegisterRequest) service.RegisterInput {
 		Phone:    dto.Phone,
 		Login:    dto.Login,
 		Password: dto.Password,
+		Role:     dto.Role,
 	}
 }
 
