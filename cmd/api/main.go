@@ -78,7 +78,7 @@ func main() {
 
 	tokenService := auth_service.NewTokenService(os.Getenv("AUTH_ISSUER"), privateKey, accessTTL, refreshTTL)
 
-	authUserService := auth_service.NewAuthUserService(userService)
+	authUserService := auth_service.NewUserServiceAdapter(userService)
 
 	authRepository := auth_repository.NewAuthRepository(db)
 	authService := auth_service.NewAuthService(authRepository, authRepository, authUserService, tokenService)

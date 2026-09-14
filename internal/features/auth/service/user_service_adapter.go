@@ -7,12 +7,12 @@ import (
 	users_service "go-marketplace/internal/features/users/service"
 )
 
-type AuthUserService struct {
+type UserServiceAdapter struct {
 	users *users_service.UserService
 }
 
-func NewAuthUserService(users *users_service.UserService) *AuthUserService {
-	return &AuthUserService{
+func NewUserServiceAdapter(users *users_service.UserService) *UserServiceAdapter {
+	return &UserServiceAdapter{
 		users: users,
 	}
 }
@@ -23,7 +23,7 @@ type CreateUserInput struct {
 	Role  string
 }
 
-func (c *AuthUserService) Create(ctx context.Context, input CreateUserInput) (int, string, error) {
+func (c *UserServiceAdapter) Create(ctx context.Context, input CreateUserInput) (int, string, error) {
 	user, err := c.users.CreateUser(ctx, domain.User{
 		Name:  input.Name,
 		Phone: input.Phone,
@@ -36,7 +36,7 @@ func (c *AuthUserService) Create(ctx context.Context, input CreateUserInput) (in
 	return user.ID, string(user.Role), nil
 }
 
-func (c *AuthUserService) GetRole(ctx context.Context, id int) (string, error) {
+func (c *UserServiceAdapter) GetRole(ctx context.Context, id int) (string, error) {
 	user, err := c.users.GetUser(ctx, id)
 	if err != nil {
 		return "", err
