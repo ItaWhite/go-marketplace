@@ -3,7 +3,7 @@ create table if not exists users (
     version bigint not null default 1,
     name varchar(50) not null check ( char_length(name) between 2 and 50),
     phone varchar(12) check ( phone ~ '^[0-9]+$'),
-    role varchar(10) not null check (role in ('buyer', 'seller')),
+    role varchar(10) not null check (role in ('buyer', 'seller', 'admin')),
     created_at timestamptz not null default now()
 );
 
