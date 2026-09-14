@@ -7,12 +7,12 @@ import (
 )
 
 func (r *userRepository) CreateUser(ctx context.Context, user domain.User) (domain.User, error) {
-	row := r.db.QueryRow(ctx, "insert into users (name, phone, role) values ($1, $2, $3) returning id, version, created_at",
+	row := r.db.QueryRow(ctx, "insert into users (name, phone, role) values ($1, $2, $3) returning id, version, role, created_at",
 		user.Name, user.Phone, user.Role)
 
 	var userModel UserModel
 
-	err := row.Scan(&userModel.ID, &userModel.Version, &userModel.CreatedAt)
+	err := row.Scan(&userModel.ID, &userModel.Version, &userModel.Role, &userModel.CreatedAt)
 	if err != nil {
 		return domain.User{}, fmt.Errorf("scan error: %w", err)
 	}
