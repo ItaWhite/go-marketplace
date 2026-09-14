@@ -55,6 +55,11 @@ func main() {
 	userService := users_service.NewUserService(userRepository)
 	userHandler := users_handler.NewUserHandler(userService)
 
+	publicKey, err := security.LoadPublicKey(os.Getenv("AUTH_PUBLIC_KEY_PATH"))
+	if err != nil {
+		slog.Error("load public key", "error", err)
+		os.Exit(1)
+	}
 	privateKey, err := security.LoadPrivateKey(os.Getenv("AUTH_PRIVATE_KEY_PATH"))
 	if err != nil {
 		slog.Error("load private key", "error", err)
@@ -81,9 +86,12 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	productHandler.RegisterRoutes(mux)
-	userHandler.RegisterRoutes(mux)
-	authHandler.RegisterRoutes(mux)
+	validator := security.NewJWTValidator(os.Getenv("AUTH_ISSUER"), publicKey)
+	authMiddleware := middleware.NewAuthMiddleware(validator)
+
+	productHandler.RegisterRoutes(mux, authMiddleware)
+	userHandler.RegisterRoutes(mux, authMiddleware)
+	authHandler.RegisterRoutes(mux, authMiddleware)
 
 	chain := middleware.Chain(
 		middleware.RequestID,
