@@ -22,4 +22,5 @@ var (
 	ErrUnauthorized        = errors.New("unauthorized")
 	ErrForbidden           = errors.New("forbidden")
 	ErrLoginAlreadyExists  = errors.New("login already exists")
+	ErrInvalidCredentials  = errors.New("invalid credentials")
 )
