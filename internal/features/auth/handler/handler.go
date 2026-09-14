@@ -18,4 +18,5 @@ func NewAuthHandler(s *service.AuthService) *AuthHandler {
 
 func (h *AuthHandler) RegisterRoutes(mux *http.ServeMux, auth *middleware.AuthMiddleware) {
 	mux.HandleFunc("POST /auth/register", h.Register)
+	mux.HandleFunc("POST /auth/login", h.Login)
 }
