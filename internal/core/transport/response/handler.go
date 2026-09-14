@@ -117,6 +117,10 @@ func (h *ResponseHandler) HandleError(err error) {
 		msg = core_errors.ErrForbidden.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusForbidden
+	case errors.Is(err, core_errors.ErrLoginAlreadyExists):
+		msg = core_errors.ErrLoginAlreadyExists.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusConflict
 	default:
 		msg = "internal server error"
 		h.logger.Error(msg, "error", err)
