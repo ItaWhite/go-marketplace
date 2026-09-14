@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
-	"go-marketplace/internal/core/domain"
 	"go-marketplace/internal/core/errors"
 	"go-marketplace/internal/core/logger"
 	"go-marketplace/internal/core/transport/response"
@@ -20,11 +19,6 @@ type RegisterRequest struct {
 	Role     string  `json:"role"`
 }
 
-type RegisterResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-}
-
 func toRegisterInput(dto RegisterRequest) service.RegisterInput {
 	return service.RegisterInput{
 		Name:     dto.Name,
@@ -32,13 +26,6 @@ func toRegisterInput(dto RegisterRequest) service.RegisterInput {
 		Login:    dto.Login,
 		Password: dto.Password,
 		Role:     dto.Role,
-	}
-}
-
-func toDTO(model domain.TokenPair) RegisterResponse {
-	return RegisterResponse{
-		AccessToken:  model.AccessToken,
-		RefreshToken: model.RefreshToken,
 	}
 }
 
@@ -70,6 +57,6 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	registerResponse := toDTO(pair)
-	rh.SendResponse(http.StatusCreated, registerResponse)
+	response := toDTO(pair)
+	rh.SendResponse(http.StatusCreated, response)
 }
