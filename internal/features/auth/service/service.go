@@ -11,10 +11,12 @@ type TokenRepository interface {
 
 type CredentialsRepository interface {
 	CreateCredentials(ctx context.Context, credentials domain.Credentials) error
+	GetByLogin(ctx context.Context, login string) (domain.Credentials, error)
 }
 
 type UserService interface {
 	Create(ctx context.Context, input CreateUserInput) (int, string, error)
+	GetRole(ctx context.Context, id int) (string, error)
 }
 
 type AuthService struct {
