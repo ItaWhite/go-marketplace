@@ -21,7 +21,7 @@ func (s *AuthService) Register(ctx context.Context, input RegisterInput) (domain
 		return domain.TokenPair{}, fmt.Errorf("register with login=%s: %w", input.Login, core_errors.ErrInvalidLogin)
 	}
 	if len(strings.TrimSpace(input.Password)) < 8 || len(strings.TrimSpace(input.Password)) > 72 {
-		return domain.TokenPair{}, fmt.Errorf("register with password=%s: %w", input.Login, core_errors.ErrInvalidPassword)
+		return domain.TokenPair{}, core_errors.ErrInvalidPassword
 	}
 
 	userID, userRole, err := s.userService.Create(ctx, CreateUserInput{
