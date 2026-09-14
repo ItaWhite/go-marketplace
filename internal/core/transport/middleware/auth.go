@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"go-marketplace/internal/core/domain"
 	"go-marketplace/internal/core/errors"
 	"go-marketplace/internal/core/logger"
 	"go-marketplace/internal/core/security"
@@ -24,7 +25,7 @@ func NewAuthMiddleware(validator *security.JWTValidator) *AuthMiddleware {
 	}
 }
 
-func (m *AuthMiddleware) Auth(next http.Handler) http.Handler {
+func (m *AuthMiddleware) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := core_logger.FromContext(r.Context())
 		rh := response.NewResponseHandler(logger, w)
@@ -58,4 +59,29 @@ func (m *AuthMiddleware) Auth(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, security.RoleKey, claims.Role)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func (m *AuthMiddleware) requireRole(role domain.UserRole, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger := core_logger.FromContext(r.Context())
+		rh := response.NewResponseHandler(logger, w)
+
+		userRole, ok := security.UserRoleFromContext(r.Context())
+		if !ok {
+			rh.HandleError(fmt.Errorf("user role not found: %w", core_errors.ErrUnauthorized))
+			return
+		}
+		if userRole != string(role) {
+			rh.HandleError(fmt.Errorf("invalid role=%s: %w", userRole, core_errors.ErrForbidden))
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (m *AuthMiddleware) RequireRole(role domain.UserRole, next http.Handler) http.Handler {
+	return m.Authenticate(
+		m.requireRole(role, next),
+	)
 }
