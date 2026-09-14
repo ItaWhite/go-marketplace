@@ -109,6 +109,14 @@ func (h *ResponseHandler) HandleError(err error) {
 		msg = core_errors.ErrInvalidPassword.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrUnauthorized):
+		msg = core_errors.ErrUnauthorized.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusUnauthorized
+	case errors.Is(err, core_errors.ErrForbidden):
+		msg = core_errors.ErrForbidden.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusForbidden
 	default:
 		msg = "internal server error"
 		h.logger.Error(msg, "error", err)
