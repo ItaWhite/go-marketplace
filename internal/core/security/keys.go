@@ -26,7 +26,7 @@ func LoadPublicKey(path string) (*rsa.PublicKey, error) {
 
 	rsaKey, ok := key.(*rsa.PublicKey)
 	if !ok {
-		return nil, errors.New("private key is not RSA")
+		return nil, errors.New("public key is not RSA")
 	}
 
 	return rsaKey, nil
