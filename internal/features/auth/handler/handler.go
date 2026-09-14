@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"go-marketplace/internal/core/transport/middleware"
 	"go-marketplace/internal/features/auth/service"
 	"net/http"
 )
@@ -15,6 +16,6 @@ func NewAuthHandler(s *service.AuthService) *AuthHandler {
 	}
 }
 
-func (h *AuthHandler) RegisterRoutes(mux *http.ServeMux) {
+func (h *AuthHandler) RegisterRoutes(mux *http.ServeMux, auth *middleware.AuthMiddleware) {
 	mux.HandleFunc("POST /auth/register", h.Register)
 }
