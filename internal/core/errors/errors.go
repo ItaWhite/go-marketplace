@@ -20,4 +20,5 @@ var (
 	ErrInvalidLogin        = errors.New("invalid login")
 	ErrInvalidPassword     = errors.New("invalid password")
 	ErrUnauthorized        = errors.New("unauthorized")
+	ErrForbidden           = errors.New("forbidden")
 )
