@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/rsa"
 	"fmt"
+	"go-marketplace/internal/core/domain"
+	"go-marketplace/internal/core/errors"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -53,7 +55,13 @@ func (v *JWTValidator) Validate(tokenString string) (AccessClaims, error) {
 		jwt.WithIssuer(v.issuer),
 	)
 	if err != nil || !token.Valid {
-		return AccessClaims{}, fmt.Errorf("invalid token")
+		return AccessClaims{}, core_errors.ErrUnauthorized
+	}
+	if claims.Subject == "" {
+		return AccessClaims{}, core_errors.ErrUnauthorized
+	}
+	if !domain.UserRole(claims.Role).IsValid() {
+		return AccessClaims{}, core_errors.ErrUnauthorized
 	}
 
 	return claims, nil
