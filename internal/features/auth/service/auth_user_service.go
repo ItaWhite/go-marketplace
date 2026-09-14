@@ -35,3 +35,12 @@ func (c *AuthUserService) Create(ctx context.Context, input CreateUserInput) (in
 
 	return user.ID, string(user.Role), nil
 }
+
+func (c *AuthUserService) GetRole(ctx context.Context, id int) (string, error) {
+	user, err := c.users.GetUser(ctx, id)
+	if err != nil {
+		return "", err
+	}
+
+	return string(user.Role), nil
+}
