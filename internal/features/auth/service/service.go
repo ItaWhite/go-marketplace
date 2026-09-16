@@ -7,6 +7,8 @@ import (
 
 type TokenRepository interface {
 	CreateRefreshToken(ctx context.Context, token domain.RefreshToken) error
+	GetRefreshToken(ctx context.Context, tokenHash string) (domain.RefreshToken, error)
+	RevokeRefreshToken(ctx context.Context, id int) error
 }
 
 type CredentialsRepository interface {
