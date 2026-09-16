@@ -121,6 +121,10 @@ func (h *ResponseHandler) HandleError(err error) {
 		msg = core_errors.ErrLoginAlreadyExists.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusConflict
+	case errors.Is(err, core_errors.ErrInvalidRefreshToken):
+		msg = core_errors.ErrInvalidRefreshToken.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
 	default:
 		msg = "internal server error"
 		h.logger.Error(msg, "error", err)

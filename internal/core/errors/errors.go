@@ -23,4 +23,5 @@ var (
 	ErrForbidden           = errors.New("forbidden")
 	ErrLoginAlreadyExists  = errors.New("login already exists")
 	ErrInvalidCredentials  = errors.New("invalid credentials")
+	ErrInvalidRefreshToken = errors.New("invalid refresh token")
 )
