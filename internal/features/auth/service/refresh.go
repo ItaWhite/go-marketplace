@@ -53,18 +53,9 @@ func (s *AuthService) Refresh(ctx context.Context, refreshTokenStr string) (doma
 		RevokedAt: nil,
 	}
 
-	err = s.tokenRepo.CreateRefreshToken(ctx, newRefreshToken)
+	err = s.tokenRepo.RotateRefreshToken(ctx, refreshToken.ID, newRefreshToken)
 	if err != nil {
-		return domain.TokenPair{}, fmt.Errorf("create refresh token: %w", err)
-	}
-
-	err = s.tokenRepo.RevokeRefreshToken(ctx, refreshToken.ID)
-	if err != nil {
-		if errors.Is(err, core_errors.ErrNotFound) {
-			return domain.TokenPair{}, core_errors.ErrInvalidRefreshToken
-		}
-
-		return domain.TokenPair{}, fmt.Errorf("revoke refresh token: %w", err)
+		return domain.TokenPair{}, fmt.Errorf("rotate refresh token: %w", err)
 	}
 
 	pair := domain.TokenPair{
