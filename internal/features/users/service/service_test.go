@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"go-marketplace/internal/core/domain"
-	core_errors "go-marketplace/internal/core/errors"
+	"go-marketplace/internal/core/errors"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -166,21 +166,6 @@ func TestUserService_CreateUser(t *testing.T) {
 		)
 
 		require.ErrorIs(t, err, core_errors.ErrInvalidName)
-	})
-
-	t.Run("invalid role", func(t *testing.T) {
-		repo := newMockUserRepo()
-		service := NewUserService(repo)
-
-		_, err := service.CreateUser(
-			context.Background(),
-			domain.User{
-				Name: "Nikita",
-				Role: "admin",
-			},
-		)
-
-		require.ErrorIs(t, err, core_errors.ErrInvalidRole)
 	})
 
 	t.Run("empty role", func(t *testing.T) {
@@ -671,26 +656,6 @@ func TestUserService_PatchUser(t *testing.T) {
 		)
 
 		require.ErrorIs(t, err, core_errors.ErrNullNotAllowed)
-	})
-
-	t.Run("invalid role", func(t *testing.T) {
-		repo := newMockUserRepo()
-		service := NewUserService(repo)
-
-		role := "admin"
-
-		_, err := service.PatchUser(
-			context.Background(),
-			1,
-			domain.UserPatch{
-				Role: domain.Nullable[string]{
-					Set:   true,
-					Value: &role,
-				},
-			},
-		)
-
-		require.ErrorIs(t, err, core_errors.ErrInvalidRole)
 	})
 
 	t.Run("repository error", func(t *testing.T) {

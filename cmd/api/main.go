@@ -6,8 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"go-marketplace/internal/core/logger"
+	"go-marketplace/internal/core/security"
 	"go-marketplace/internal/core/storage"
 	"go-marketplace/internal/core/transport/middleware"
+	auth_handler "go-marketplace/internal/features/auth/handler"
+	auth_repository "go-marketplace/internal/features/auth/repository"
+	auth_service "go-marketplace/internal/features/auth/service"
 	products_handler "go-marketplace/internal/features/products/handler"
 	products_repository "go-marketplace/internal/features/products/repository"
 	products_service "go-marketplace/internal/features/products/service"
@@ -51,10 +55,43 @@ func main() {
 	userService := users_service.NewUserService(userRepository)
 	userHandler := users_handler.NewUserHandler(userService)
 
+	publicKey, err := security.LoadPublicKey(os.Getenv("AUTH_PUBLIC_KEY_PATH"))
+	if err != nil {
+		slog.Error("load public key", "error", err)
+		os.Exit(1)
+	}
+	privateKey, err := security.LoadPrivateKey(os.Getenv("AUTH_PRIVATE_KEY_PATH"))
+	if err != nil {
+		slog.Error("load private key", "error", err)
+		os.Exit(1)
+	}
+	accessTTL, err := time.ParseDuration(os.Getenv("AUTH_ACCESS_TTL"))
+	if err != nil {
+		slog.Error("parse access TTL", "error", err)
+		os.Exit(1)
+	}
+	refreshTTL, err := time.ParseDuration(os.Getenv("AUTH_REFRESH_TTL"))
+	if err != nil {
+		slog.Error("parse refresh TTL", "error", err)
+		os.Exit(1)
+	}
+
+	tokenService := auth_service.NewTokenService(os.Getenv("AUTH_ISSUER"), privateKey, accessTTL, refreshTTL)
+
+	authUserService := auth_service.NewUserServiceAdapter(userService)
+
+	authRepository := auth_repository.NewAuthRepository(db)
+	authService := auth_service.NewAuthService(authRepository, authRepository, authUserService, tokenService)
+	authHandler := auth_handler.NewAuthHandler(authService)
+
 	mux := http.NewServeMux()
 
-	productHandler.RegisterRoutes(mux)
-	userHandler.RegisterRoutes(mux)
+	validator := security.NewJWTValidator(os.Getenv("AUTH_ISSUER"), publicKey)
+	authMiddleware := middleware.NewAuthMiddleware(validator)
+
+	productHandler.RegisterRoutes(mux, authMiddleware)
+	userHandler.RegisterRoutes(mux, authMiddleware)
+	authHandler.RegisterRoutes(mux, authMiddleware)
 
 	chain := middleware.Chain(
 		middleware.RequestID,

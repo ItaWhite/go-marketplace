@@ -7,6 +7,7 @@ type UserRole string
 const (
 	UserBuyer  UserRole = "buyer"
 	UserSeller UserRole = "seller"
+	UserAdmin  UserRole = "admin"
 )
 
 type User struct {
@@ -20,7 +21,7 @@ type User struct {
 
 func (r UserRole) IsValid() bool {
 	switch r {
-	case UserBuyer, UserSeller:
+	case UserBuyer, UserSeller, UserAdmin:
 		return true
 	default:
 		return false

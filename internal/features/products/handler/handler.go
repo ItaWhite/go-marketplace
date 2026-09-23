@@ -1,24 +1,26 @@
 package handler
 
 import (
-	productfeat "go-marketplace/internal/features/products/service"
+	"go-marketplace/internal/core/domain"
+	"go-marketplace/internal/core/transport/middleware"
+	"go-marketplace/internal/features/products/service"
 	"net/http"
 )
 
 type ProductHandler struct {
-	service *productfeat.ProductService
+	service *service.ProductService
 }
 
-func NewProductHandler(s *productfeat.ProductService) *ProductHandler {
+func NewProductHandler(s *service.ProductService) *ProductHandler {
 	return &ProductHandler{
 		service: s,
 	}
 }
 
-func (h *ProductHandler) RegisterRoutes(mux *http.ServeMux) {
+func (h *ProductHandler) RegisterRoutes(mux *http.ServeMux, auth *middleware.AuthMiddleware) {
 	mux.HandleFunc("GET /products", h.GetProducts)
 	mux.HandleFunc("GET /products/{id}", h.GetProduct)
-	mux.HandleFunc("POST /products", h.PostProduct)
-	mux.HandleFunc("PATCH /products/{id}", h.PatchProduct)
-	mux.HandleFunc("DELETE /products/{id}", h.DeleteProduct)
+	mux.Handle("POST /products", auth.RequireRole(domain.UserSeller, http.HandlerFunc(h.PostProduct)))
+	mux.Handle("PATCH /products/{id}", auth.RequireRole(domain.UserSeller, http.HandlerFunc(h.PatchProduct)))
+	mux.Handle("DELETE /products/{id}", auth.RequireRole(domain.UserSeller, http.HandlerFunc(h.DeleteProduct)))
 }

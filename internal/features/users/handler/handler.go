@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"go-marketplace/internal/core/domain"
+	"go-marketplace/internal/core/transport/middleware"
 	"go-marketplace/internal/features/users/service"
 	"net/http"
 )
@@ -15,10 +17,10 @@ func NewUserHandler(s *service.UserService) *UserHandler {
 	}
 }
 
-func (h *UserHandler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /users", h.GetUsers)
-	mux.HandleFunc("GET /users/{id}", h.GetUser)
-	mux.HandleFunc("POST /users", h.PostUser)
-	mux.HandleFunc("PATCH /users/{id}", h.PatchUser)
-	mux.HandleFunc("DELETE /users/{id}", h.DeleteUser)
+func (h *UserHandler) RegisterRoutes(mux *http.ServeMux, auth *middleware.AuthMiddleware) {
+	mux.Handle("GET /users", auth.RequireRole(domain.UserAdmin, http.HandlerFunc(h.GetUsers)))
+	mux.Handle("GET /users/{id}", auth.RequireRole(domain.UserAdmin, http.HandlerFunc(h.GetUser)))
+	mux.Handle("POST /users", auth.RequireRole(domain.UserAdmin, http.HandlerFunc(h.PostUser)))
+	mux.Handle("PATCH /users/{id}", auth.RequireRole(domain.UserAdmin, http.HandlerFunc(h.PatchUser)))
+	mux.Handle("DELETE /users/{id}", auth.RequireRole(domain.UserAdmin, http.HandlerFunc(h.DeleteUser)))
 }

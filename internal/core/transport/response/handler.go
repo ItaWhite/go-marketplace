@@ -26,13 +26,13 @@ func NewResponseHandler(logger *slog.Logger, w http.ResponseWriter) *ResponseHan
 }
 
 func (h *ResponseHandler) SendResponse(code int, v any) {
-	h.w.Header().Set("Content-Type", "application/json")
-
-	h.w.WriteHeader(code)
-
 	if code == http.StatusNoContent {
+		h.w.WriteHeader(code)
 		return
 	}
+
+	h.w.Header().Set("Content-Type", "application/json")
+	h.w.WriteHeader(code)
 
 	err := json.NewEncoder(h.w).Encode(v)
 	if err != nil {
@@ -99,6 +99,30 @@ func (h *ResponseHandler) HandleError(err error) {
 		code = http.StatusBadRequest
 	case errors.Is(err, core_errors.ErrInvalidQueryParam):
 		msg = core_errors.ErrInvalidQueryParam.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrInvalidLogin):
+		msg = core_errors.ErrInvalidLogin.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrInvalidPassword):
+		msg = core_errors.ErrInvalidPassword.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusBadRequest
+	case errors.Is(err, core_errors.ErrUnauthorized):
+		msg = core_errors.ErrUnauthorized.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusUnauthorized
+	case errors.Is(err, core_errors.ErrForbidden):
+		msg = core_errors.ErrForbidden.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusForbidden
+	case errors.Is(err, core_errors.ErrLoginAlreadyExists):
+		msg = core_errors.ErrLoginAlreadyExists.Error()
+		h.logger.Warn(msg, "error", err)
+		code = http.StatusConflict
+	case errors.Is(err, core_errors.ErrInvalidRefreshToken):
+		msg = core_errors.ErrInvalidRefreshToken.Error()
 		h.logger.Warn(msg, "error", err)
 		code = http.StatusBadRequest
 	default:
