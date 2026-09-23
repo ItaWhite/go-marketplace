@@ -26,13 +26,13 @@ func NewResponseHandler(logger *slog.Logger, w http.ResponseWriter) *ResponseHan
 }
 
 func (h *ResponseHandler) SendResponse(code int, v any) {
-	h.w.Header().Set("Content-Type", "application/json")
-
-	h.w.WriteHeader(code)
-
 	if code == http.StatusNoContent {
+		h.w.WriteHeader(code)
 		return
 	}
+
+	h.w.Header().Set("Content-Type", "application/json")
+	h.w.WriteHeader(code)
 
 	err := json.NewEncoder(h.w).Encode(v)
 	if err != nil {
