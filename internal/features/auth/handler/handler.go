@@ -20,4 +20,5 @@ func (h *AuthHandler) RegisterRoutes(mux *http.ServeMux, auth *middleware.AuthMi
 	mux.HandleFunc("POST /auth/register", h.Register)
 	mux.HandleFunc("POST /auth/login", h.Login)
 	mux.HandleFunc("POST /auth/refresh", h.Refresh)
+	mux.HandleFunc("POST /auth/logout", h.Logout)
 }
