@@ -15,16 +15,20 @@ import (
 	products_handler "go-marketplace/internal/features/products/handler"
 	products_repository "go-marketplace/internal/features/products/repository"
 	products_service "go-marketplace/internal/features/products/service"
+	users_grpc_server "go-marketplace/internal/features/users/grpc"
 	users_handler "go-marketplace/internal/features/users/handler"
 	users_repository "go-marketplace/internal/features/users/repository"
 	users_service "go-marketplace/internal/features/users/service"
+	users_grpc "go-marketplace/proto/gen"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/joho/godotenv"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -54,6 +58,29 @@ func main() {
 	userRepository := users_repository.NewUserRepository(db)
 	userService := users_service.NewUserService(userRepository)
 	userHandler := users_handler.NewUserHandler(userService)
+
+	userGRPCServer := users_grpc_server.NewUserServiceServer(userService)
+
+	grpcServer := grpc.NewServer()
+	users_grpc.RegisterUserServiceServer(grpcServer, userGRPCServer)
+
+	grpcPort := os.Getenv("GRPC_PORT")
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
+	if err != nil {
+		slog.Error("listen grpc", "error", err)
+		os.Exit(1)
+	}
+
+	go func() {
+		slog.Info("grpc server started", "port", grpcPort)
+
+		err = grpcServer.Serve(lis)
+		if err != nil {
+			slog.Error("grpc server failed", "error", err)
+			return
+		}
+	}()
 
 	publicKey, err := security.LoadPublicKey(os.Getenv("AUTH_PUBLIC_KEY_PATH"))
 	if err != nil {
@@ -138,29 +165,32 @@ func main() {
 		os.Exit(1)
 	}
 
-	slog.Info("server started", "port", os.Getenv("SERVER_PORT"))
+	slog.Info("http server started", "port", os.Getenv("SERVER_PORT"))
 
 	go func() {
 		err := s.ListenAndServeTLS(cert, key)
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			slog.Error("server failed", "error", err)
+			slog.Error("http server failed", "error", err)
 		}
 		cancel()
 	}()
 
 	<-ctx.Done()
 
+	grpcServer.GracefulStop()
+	slog.Info("grpc server stopped")
+
 	ctx, stop := context.WithTimeout(context.Background(), 5*time.Second)
 	defer stop()
 
-	slog.Info("shutting down server")
+	slog.Info("shutting down http server")
 
 	start := time.Now()
 
 	err = s.Shutdown(ctx)
 	if err != nil {
-		slog.Error("server shutdown error", "error", err)
+		slog.Error("http server shutdown error", "error", err)
 	} else {
-		slog.Info("server stopped", "duration", time.Since(start))
+		slog.Info("http server stopped", "duration", time.Since(start))
 	}
 }
