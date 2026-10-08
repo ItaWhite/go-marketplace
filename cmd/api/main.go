@@ -9,9 +9,6 @@ import (
 	"go-marketplace/internal/core/security"
 	"go-marketplace/internal/core/storage"
 	"go-marketplace/internal/core/transport/middleware"
-	auth_handler "go-marketplace/internal/features/auth/handler"
-	auth_repository "go-marketplace/internal/features/auth/repository"
-	auth_service "go-marketplace/internal/features/auth/service"
 	products_handler "go-marketplace/internal/features/products/handler"
 	products_repository "go-marketplace/internal/features/products/repository"
 	products_service "go-marketplace/internal/features/products/service"
@@ -19,7 +16,7 @@ import (
 	users_handler "go-marketplace/internal/features/users/handler"
 	users_repository "go-marketplace/internal/features/users/repository"
 	users_service "go-marketplace/internal/features/users/service"
-	users_grpc "go-marketplace/proto/gen"
+	"go-marketplace/proto/gen"
 	"log/slog"
 	"net"
 	"net/http"
@@ -87,29 +84,6 @@ func main() {
 		slog.Error("load public key", "error", err)
 		os.Exit(1)
 	}
-	privateKey, err := security.LoadPrivateKey(os.Getenv("AUTH_PRIVATE_KEY_PATH"))
-	if err != nil {
-		slog.Error("load private key", "error", err)
-		os.Exit(1)
-	}
-	accessTTL, err := time.ParseDuration(os.Getenv("AUTH_ACCESS_TTL"))
-	if err != nil {
-		slog.Error("parse access TTL", "error", err)
-		os.Exit(1)
-	}
-	refreshTTL, err := time.ParseDuration(os.Getenv("AUTH_REFRESH_TTL"))
-	if err != nil {
-		slog.Error("parse refresh TTL", "error", err)
-		os.Exit(1)
-	}
-
-	tokenService := auth_service.NewTokenService(os.Getenv("AUTH_ISSUER"), privateKey, accessTTL, refreshTTL)
-
-	authUserService := auth_service.NewUserServiceAdapter(userService)
-
-	authRepository := auth_repository.NewAuthRepository(db)
-	authService := auth_service.NewAuthService(authRepository, authRepository, authUserService, tokenService)
-	authHandler := auth_handler.NewAuthHandler(authService)
 
 	mux := http.NewServeMux()
 
@@ -118,7 +92,6 @@ func main() {
 
 	productHandler.RegisterRoutes(mux, authMiddleware)
 	userHandler.RegisterRoutes(mux, authMiddleware)
-	authHandler.RegisterRoutes(mux, authMiddleware)
 
 	chain := middleware.Chain(
 		middleware.RequestID,
@@ -130,8 +103,6 @@ func main() {
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS12,
 	}
-
-	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 
 	readTimeout, err := time.ParseDuration(os.Getenv("SERVER_READ_TIMEOUT"))
 	if err != nil {
@@ -150,7 +121,7 @@ func main() {
 	}
 
 	s := http.Server{
-		Addr:         addr,
+		Addr:         fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")),
 		Handler:      chain(mux),
 		TLSConfig:    tlsConfig,
 		ReadTimeout:  readTimeout,
@@ -172,6 +143,7 @@ func main() {
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			slog.Error("http server failed", "error", err)
 		}
+
 		cancel()
 	}()
 
