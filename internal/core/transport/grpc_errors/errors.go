@@ -2,6 +2,7 @@ package grpc_errors
 
 import (
 	"errors"
+	"fmt"
 	"go-marketplace/internal/core/errors"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
@@ -46,5 +47,43 @@ func ToGRPCError(err error) error {
 		return status.Error(codes.NotFound, err.Error())
 	default:
 		return status.Error(codes.Internal, err.Error())
+	}
+}
+
+func MapInvalidArgument(violation *errdetails.BadRequest_FieldViolation) error {
+	switch Reason(violation.Reason) {
+	case ReasonInvalidID:
+		return core_errors.ErrInvalidID
+	case ReasonInvalidName:
+		return core_errors.ErrInvalidName
+	case ReasonInvalidRole:
+		return core_errors.ErrInvalidRole
+	case ReasonInvalidPhone:
+		return core_errors.ErrInvalidPhone
+	default:
+		return fmt.Errorf("internal error")
+	}
+}
+
+func ToSentinelError(err error) error {
+	st, ok := status.FromError(err)
+	if !ok {
+		return fmt.Errorf("users grpc request: %w", err)
+	}
+
+	switch st.Code() {
+	case codes.InvalidArgument:
+		detail := st.Details()[0]
+
+		violation, ok := detail.(*errdetails.BadRequest_FieldViolation)
+		if !ok {
+			return fmt.Errorf("users grpc request: %w", err)
+		}
+
+		return fmt.Errorf("%s: %w", st.Message(), MapInvalidArgument(violation))
+	case codes.NotFound:
+		return core_errors.ErrNotFound
+	default:
+		return fmt.Errorf("users grpc request: code=%s: %s", st.Code(), st.Message())
 	}
 }
