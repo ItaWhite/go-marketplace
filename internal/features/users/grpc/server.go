@@ -3,16 +3,17 @@ package grpc
 import (
 	"context"
 	"go-marketplace/internal/core/domain"
-	users_service "go-marketplace/internal/features/users/service"
-	users_grpc "go-marketplace/proto/gen"
+	"go-marketplace/internal/core/transport/grpc_errors"
+	"go-marketplace/internal/features/users/service"
+	"go-marketplace/proto/gen"
 )
 
 type userServiceServer struct {
 	users_grpc.UnimplementedUserServiceServer
-	users *users_service.UserService
+	users *service.UserService
 }
 
-func NewUserServiceServer(users *users_service.UserService) *userServiceServer {
+func NewUserServiceServer(users *service.UserService) *userServiceServer {
 	return &userServiceServer{
 		users: users,
 	}
@@ -25,7 +26,7 @@ func (s *userServiceServer) CreateUser(ctx context.Context, req *users_grpc.Crea
 		Role:  domain.UserRole(req.GetRole()),
 	})
 	if err != nil {
-		return nil, err
+		return nil, grpc_errors.ToGRPCError(err)
 	}
 
 	return &users_grpc.CreateUserResponse{
@@ -37,7 +38,7 @@ func (s *userServiceServer) CreateUser(ctx context.Context, req *users_grpc.Crea
 func (s *userServiceServer) GetUserRole(ctx context.Context, req *users_grpc.GetUserRoleRequest) (*users_grpc.GetUserRoleResponse, error) {
 	user, err := s.users.GetUser(ctx, int(req.GetId()))
 	if err != nil {
-		return nil, err
+		return nil, grpc_errors.ToGRPCError(err)
 	}
 
 	return &users_grpc.GetUserRoleResponse{
