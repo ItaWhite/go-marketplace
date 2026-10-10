@@ -9,22 +9,23 @@ import (
 	"go-marketplace/internal/core/security"
 	"go-marketplace/internal/core/storage"
 	"go-marketplace/internal/core/transport/middleware"
-	auth_handler "go-marketplace/internal/features/auth/handler"
-	auth_repository "go-marketplace/internal/features/auth/repository"
-	auth_service "go-marketplace/internal/features/auth/service"
 	products_handler "go-marketplace/internal/features/products/handler"
 	products_repository "go-marketplace/internal/features/products/repository"
 	products_service "go-marketplace/internal/features/products/service"
+	users_grpc_server "go-marketplace/internal/features/users/grpc"
 	users_handler "go-marketplace/internal/features/users/handler"
 	users_repository "go-marketplace/internal/features/users/repository"
 	users_service "go-marketplace/internal/features/users/service"
+	"go-marketplace/proto/gen"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/joho/godotenv"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -55,34 +56,34 @@ func main() {
 	userService := users_service.NewUserService(userRepository)
 	userHandler := users_handler.NewUserHandler(userService)
 
+	userGRPCServer := users_grpc_server.NewUserServiceServer(userService)
+
+	grpcServer := grpc.NewServer()
+	users_grpc.RegisterUserServiceServer(grpcServer, userGRPCServer)
+
+	grpcPort := os.Getenv("GRPC_PORT")
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
+	if err != nil {
+		slog.Error("listen grpc", "error", err)
+		os.Exit(1)
+	}
+
+	go func() {
+		slog.Info("grpc server started", "port", grpcPort)
+
+		err = grpcServer.Serve(lis)
+		if err != nil {
+			slog.Error("grpc server failed", "error", err)
+			return
+		}
+	}()
+
 	publicKey, err := security.LoadPublicKey(os.Getenv("AUTH_PUBLIC_KEY_PATH"))
 	if err != nil {
 		slog.Error("load public key", "error", err)
 		os.Exit(1)
 	}
-	privateKey, err := security.LoadPrivateKey(os.Getenv("AUTH_PRIVATE_KEY_PATH"))
-	if err != nil {
-		slog.Error("load private key", "error", err)
-		os.Exit(1)
-	}
-	accessTTL, err := time.ParseDuration(os.Getenv("AUTH_ACCESS_TTL"))
-	if err != nil {
-		slog.Error("parse access TTL", "error", err)
-		os.Exit(1)
-	}
-	refreshTTL, err := time.ParseDuration(os.Getenv("AUTH_REFRESH_TTL"))
-	if err != nil {
-		slog.Error("parse refresh TTL", "error", err)
-		os.Exit(1)
-	}
-
-	tokenService := auth_service.NewTokenService(os.Getenv("AUTH_ISSUER"), privateKey, accessTTL, refreshTTL)
-
-	authUserService := auth_service.NewUserServiceAdapter(userService)
-
-	authRepository := auth_repository.NewAuthRepository(db)
-	authService := auth_service.NewAuthService(authRepository, authRepository, authUserService, tokenService)
-	authHandler := auth_handler.NewAuthHandler(authService)
 
 	mux := http.NewServeMux()
 
@@ -91,7 +92,6 @@ func main() {
 
 	productHandler.RegisterRoutes(mux, authMiddleware)
 	userHandler.RegisterRoutes(mux, authMiddleware)
-	authHandler.RegisterRoutes(mux, authMiddleware)
 
 	chain := middleware.Chain(
 		middleware.RequestID,
@@ -103,8 +103,6 @@ func main() {
 	tlsConfig := &tls.Config{
 		MinVersion: tls.VersionTLS12,
 	}
-
-	addr := fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
 
 	readTimeout, err := time.ParseDuration(os.Getenv("SERVER_READ_TIMEOUT"))
 	if err != nil {
@@ -123,7 +121,7 @@ func main() {
 	}
 
 	s := http.Server{
-		Addr:         addr,
+		Addr:         fmt.Sprintf(":%s", os.Getenv("SERVER_PORT")),
 		Handler:      chain(mux),
 		TLSConfig:    tlsConfig,
 		ReadTimeout:  readTimeout,
@@ -138,29 +136,33 @@ func main() {
 		os.Exit(1)
 	}
 
-	slog.Info("server started", "port", os.Getenv("SERVER_PORT"))
+	slog.Info("http server started", "port", os.Getenv("SERVER_PORT"))
 
 	go func() {
 		err := s.ListenAndServeTLS(cert, key)
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			slog.Error("server failed", "error", err)
+			slog.Error("http server failed", "error", err)
 		}
+
 		cancel()
 	}()
 
 	<-ctx.Done()
 
+	grpcServer.GracefulStop()
+	slog.Info("grpc server stopped")
+
 	ctx, stop := context.WithTimeout(context.Background(), 5*time.Second)
 	defer stop()
 
-	slog.Info("shutting down server")
+	slog.Info("shutting down http server")
 
 	start := time.Now()
 
 	err = s.Shutdown(ctx)
 	if err != nil {
-		slog.Error("server shutdown error", "error", err)
+		slog.Error("http server shutdown error", "error", err)
 	} else {
-		slog.Info("server stopped", "duration", time.Since(start))
+		slog.Info("http server stopped", "duration", time.Since(start))
 	}
 }

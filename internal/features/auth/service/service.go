@@ -17,6 +17,12 @@ type CredentialsRepository interface {
 	GetByLogin(ctx context.Context, login string) (domain.Credentials, error)
 }
 
+type CreateUserInput struct {
+	Name  string
+	Phone *string
+	Role  string
+}
+
 type UserService interface {
 	Create(ctx context.Context, input CreateUserInput) (int, string, error)
 	GetRole(ctx context.Context, id int) (string, error)

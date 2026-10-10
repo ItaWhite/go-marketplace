@@ -21,3 +21,6 @@ migrate-up:
 
 migrate-down:
 	docker compose run --rm postgres-migrate -path /migrations -database postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable down
+
+protoc-gen:
+	protoc -I proto proto/users.proto --go_out=./proto/gen --go_opt=paths=source_relative --go-grpc_out=./proto/gen --go-grpc_opt=paths=source_relative
