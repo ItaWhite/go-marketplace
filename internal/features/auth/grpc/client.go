@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"go-marketplace/internal/core/transport/grpc_errors"
 	"go-marketplace/internal/features/auth/service"
 	"go-marketplace/proto/gen"
 
@@ -34,7 +35,7 @@ func (c *userServiceClient) Create(ctx context.Context, input service.CreateUser
 
 	resp, err := c.client.CreateUser(ctx, req)
 	if err != nil {
-		return 0, "", err
+		return 0, "", grpc_errors.ToSentinelError(err)
 	}
 
 	return int(resp.GetId()), resp.GetRole(), nil
@@ -47,7 +48,7 @@ func (c *userServiceClient) GetRole(ctx context.Context, id int) (string, error)
 
 	resp, err := c.client.GetUserRole(ctx, req)
 	if err != nil {
-		return "", err
+		return "", grpc_errors.ToSentinelError(err)
 	}
 
 	return resp.GetRole(), nil
