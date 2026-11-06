@@ -15,3 +15,10 @@ services:
     image: migrate/migrate:v4.19.1
     volumes:
       - ${PROJECT_ROOT}/migrations:/migrations
+
+  swagger:
+    build:
+      context: ${PROJECT_ROOT}
+      dockerfile: Dockerfile
+    volumes:
+      - ${PROJECT_ROOT}:/code
