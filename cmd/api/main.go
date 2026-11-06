@@ -30,6 +30,9 @@ import (
 	"google.golang.org/grpc"
 )
 
+// @title Схема API Go Marketplace
+// @version 1.0
+// @host localhost:8080
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
