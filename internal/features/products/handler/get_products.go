@@ -21,6 +21,17 @@ func toDTOs(domains []domain.Product) []ProductResponse {
 	return dtos
 }
 
+// GetProducts godoc
+// @Summary Получить список товаров
+// @Tags products
+// @Produce json
+// @Param limit query int false "Размер страницы с товарами"
+// @Param offset query int false "Смещение страницы с товарами"
+// @Success 200 {object} GetProductsResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 403 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /products [get]
 func (h *ProductHandler) GetProducts(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)

@@ -13,9 +13,9 @@ import (
 )
 
 type PatchProductRequest struct {
-	Name        domain.Nullable[string] `json:"name"`
-	Description domain.Nullable[string] `json:"description"`
-	Price       domain.Nullable[int]    `json:"price"`
+	Name        domain.Nullable[string] `json:"name" swaggertype:"string"`
+	Description domain.Nullable[string] `json:"description" swaggertype:"string"`
+	Price       domain.Nullable[int]    `json:"price" swaggertype:"string"`
 }
 
 type PatchProductResponse ProductResponse
@@ -28,6 +28,25 @@ func toProductPatchDomain(dto PatchProductRequest) domain.ProductPatch {
 	}
 }
 
+// PatchProduct godoc
+// @Summary Обновить товар
+// @Description ### Логика обновления полей:
+// @Description 1. **Поле отсутствует**: игнорируется, значение в БД не изменяется
+// @Description 2. **Передано значение**: значение в БД изменяется на переданное
+// @Description 3. **Передан `null`**: поле в БД очищается
+// @Description Ограничения: `name` и `price` не могут быть `null`
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param id path int true "ID товара"
+// @Param request body PatchProductRequest true "Тело запроса"
+// @Success 200 {object} PatchProductResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 403 {object} response.ErrorResponse
+// @Failure 404 {object} response.ErrorResponse
+// @Failure 409 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /products/{id} [patch]
 func (h *ProductHandler) PatchProduct(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)

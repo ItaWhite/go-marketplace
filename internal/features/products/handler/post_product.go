@@ -29,6 +29,17 @@ func toDomain(dto PostProductRequest) domain.Product {
 	}
 }
 
+// PostProduct godoc
+// @Summary Создать товар
+// @Tags products
+// @Accept json
+// @Produce json
+// @Param request body PostProductRequest true "Тело запроса"
+// @Success 201 {object} PostProductResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 403 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /products [post]
 func (h *ProductHandler) PostProduct(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)
