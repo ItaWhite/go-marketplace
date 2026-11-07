@@ -30,7 +30,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-// @title Схема API Go Marketplace
+// @title Схема REST API Go Marketplace: сервис api
 // @version 1.0
 // @host localhost:8080
 func main() {
