@@ -14,6 +14,17 @@ type LogoutRequest struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+// Logout godoc
+// @Summary Выход из системы
+// @Description Инвалидирует refresh-токен
+// @Tags auth
+// @Accept json
+// @Param request body LogoutRequest true "Refresh-токен"
+// @Success 204
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /auth/logout [post]
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)

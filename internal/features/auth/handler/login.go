@@ -23,6 +23,18 @@ func toLoginRequest(dto LoginRequest) service.LoginInput {
 	}
 }
 
+// Login godoc
+// @Summary Авторизация пользователя
+// @Description Проверяет учетные данные и возвращает пару токенов
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body LoginRequest true "Учетные данные"
+// @Success 200 {object} Response
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)
