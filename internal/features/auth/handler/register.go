@@ -29,6 +29,18 @@ func toRegisterInput(dto RegisterRequest) service.RegisterInput {
 	}
 }
 
+// Register godoc
+// @Summary Регистрация пользователя
+// @Description Создает пользователя и его учетные данные, возвращает пару токенов
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RegisterRequest true "Данные для регистрации"
+// @Success 201 {object} Response
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 409 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /auth/register [post]
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)

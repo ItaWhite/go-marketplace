@@ -13,9 +13,9 @@ import (
 )
 
 type PatchUserRequest struct {
-	Name  domain.Nullable[string] `json:"name"`
-	Phone domain.Nullable[string] `json:"phone"`
-	Role  domain.Nullable[string] `json:"role"`
+	Name  domain.Nullable[string] `json:"name" swaggertype:"string"`
+	Phone domain.Nullable[string] `json:"phone" swaggertype:"string"`
+	Role  domain.Nullable[string] `json:"role" swaggertype:"string"`
 }
 
 type PatchUserResponse UserResponse
@@ -28,6 +28,24 @@ func toUserPatchDomain(dto PatchUserRequest) domain.UserPatch {
 	}
 }
 
+// PatchUser godoc
+// @Summary Обновить пользователя
+// @Description ### Логика обновления полей:
+// @Description 1. **Поле отсутствует**: игнорируется, значение в БД не изменяется
+// @Description 2. **Передано значение**: значение в БД изменяется на переданное
+// @Description 3. **Передан `null`**: поле в БД очищается
+// @Description Ограничения: `name` и `phone` не могут быть `null`
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param id path int true "ID пользователя"
+// @Param request body PatchUserRequest true "Тело запроса"
+// @Success 200 {object} PatchUserResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 404 {object} response.ErrorResponse
+// @Failure 409 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /users/{id} [patch]
 func (h *UserHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)

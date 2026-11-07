@@ -5,10 +5,12 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	docs "go-marketplace/docs/api"
 	"go-marketplace/internal/core/logger"
 	"go-marketplace/internal/core/security"
 	"go-marketplace/internal/core/storage"
 	"go-marketplace/internal/core/transport/middleware"
+	core_swagger "go-marketplace/internal/core/transport/swagger"
 	products_handler "go-marketplace/internal/features/products/handler"
 	products_repository "go-marketplace/internal/features/products/repository"
 	products_service "go-marketplace/internal/features/products/service"
@@ -28,6 +30,9 @@ import (
 	"google.golang.org/grpc"
 )
 
+// @title Схема REST API Go Marketplace: сервис api
+// @version 1.0
+// @host localhost:8080
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
@@ -92,6 +97,8 @@ func main() {
 
 	productHandler.RegisterRoutes(mux, authMiddleware)
 	userHandler.RegisterRoutes(mux, authMiddleware)
+
+	core_swagger.RegisterSwagger(mux, docs.SwaggerInfo.ReadDoc)
 
 	chain := middleware.Chain(
 		middleware.RequestID,

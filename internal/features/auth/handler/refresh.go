@@ -14,6 +14,18 @@ type RefreshRequest struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+// Refresh godoc
+// @Summary Обновить пару токенов
+// @Description Выпускает новую пару access и refresh-токенов
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RefreshRequest true "Refresh-токен"
+// @Success 200 {object} Response
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 401 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /auth/refresh [post]
 func (h *AuthHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)

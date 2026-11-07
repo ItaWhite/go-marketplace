@@ -27,6 +27,16 @@ func toDomain(dto PostUserRequest) domain.User {
 	}
 }
 
+// PostUser godoc
+// @Summary Создать пользователя
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param request body PostUserRequest true "Тело запроса"
+// @Success 201 {object} PostUserResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /users [post]
 func (h *UserHandler) PostUser(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)

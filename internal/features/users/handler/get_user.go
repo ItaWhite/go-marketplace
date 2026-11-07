@@ -10,6 +10,16 @@ import (
 
 type GetUserResponse UserResponse
 
+// GetUser godoc
+// @Summary Получить пользователя по ID
+// @Tags users
+// @Produce json
+// @Param id path int true "ID пользователя"
+// @Success 200 {object} GetUserResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 404 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /users/{id} [get]
 func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)

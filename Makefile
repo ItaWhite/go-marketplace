@@ -24,3 +24,9 @@ migrate-down:
 
 protoc-gen:
 	protoc -I proto proto/users.proto --go_out=./proto/gen --go_opt=paths=source_relative --go-grpc_out=./proto/gen --go-grpc_opt=paths=source_relative
+
+swagger-api:
+	docker compose run --rm swagger init -g main.go -d ./cmd/api,./internal/features/users/handler,./internal/features/products/handler -o docs/api --parseInternal --parseDependency
+
+swagger-auth:
+	docker compose run --rm swagger init -g main.go -d ./cmd/auth,./internal/features/auth/handler -o docs/auth --parseInternal --parseDependency

@@ -5,10 +5,12 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	docs "go-marketplace/docs/auth"
 	"go-marketplace/internal/core/logger"
 	"go-marketplace/internal/core/security"
 	"go-marketplace/internal/core/storage"
 	"go-marketplace/internal/core/transport/middleware"
+	core_swagger "go-marketplace/internal/core/transport/swagger"
 	auth_grpc_client "go-marketplace/internal/features/auth/grpc"
 	auth_handler "go-marketplace/internal/features/auth/handler"
 	auth_repository "go-marketplace/internal/features/auth/repository"
@@ -22,6 +24,9 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title Схема REST API Go Marketplace: сервис auth
+// @version 1.0
+// @host localhost:8081
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
@@ -91,6 +96,8 @@ func main() {
 	authMiddleware := middleware.NewAuthMiddleware(validator)
 
 	authHandler.RegisterRoutes(mux, authMiddleware)
+
+	core_swagger.RegisterSwagger(mux, docs.SwaggerInfo.ReadDoc)
 
 	chain := middleware.Chain(
 		middleware.RequestID,
