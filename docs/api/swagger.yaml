@@ -1,4 +1,519 @@
+definitions:
+  go-marketplace_internal_core_transport_response.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  internal_features_products_handler.GetProductResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      seller_id:
+        type: integer
+      version:
+        type: integer
+    type: object
+  internal_features_products_handler.PatchProductRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: string
+    type: object
+  internal_features_products_handler.PatchProductResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      seller_id:
+        type: integer
+      version:
+        type: integer
+    type: object
+  internal_features_products_handler.PostProductRequest:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: integer
+      seller_id:
+        type: integer
+    type: object
+  internal_features_products_handler.PostProductResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      seller_id:
+        type: integer
+      version:
+        type: integer
+    type: object
+  internal_features_products_handler.ProductResponse:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: integer
+      seller_id:
+        type: integer
+      version:
+        type: integer
+    type: object
+  internal_features_users_handler.GetUserResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      version:
+        type: integer
+    type: object
+  internal_features_users_handler.PatchUserRequest:
+    properties:
+      name:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+    type: object
+  internal_features_users_handler.PatchUserResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      version:
+        type: integer
+    type: object
+  internal_features_users_handler.PostUserRequest:
+    properties:
+      name:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+    type: object
+  internal_features_users_handler.PostUserResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      version:
+        type: integer
+    type: object
+  internal_features_users_handler.UserResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      role:
+        type: string
+      version:
+        type: integer
+    type: object
+host: localhost:8080
 info:
   contact: {}
-paths: {}
+  title: Схема API Go Marketplace
+  version: "1.0"
+paths:
+  /products:
+    get:
+      parameters:
+      - description: Размер страницы с товарами
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение страницы с товарами
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_features_products_handler.ProductResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+      summary: Получить список товаров
+      tags:
+      - products
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_products_handler.PostProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_features_products_handler.PostProductResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+      summary: Создать товар
+      tags:
+      - products
+  /products/{id}:
+    delete:
+      parameters:
+      - description: ID товара
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+      tags:
+      - products
+    get:
+      parameters:
+      - description: ID товара
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_products_handler.GetProductResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+      summary: Получить товар по ID
+      tags:
+      - products
+    patch:
+      consumes:
+      - application/json
+      description: |-
+        ### Логика обновления полей:
+        1. **Поле отсутствует**: игнорируется, значение в БД не изменяется
+        2. **Передано значение**: значение в БД изменяется на переданное
+        3. **Передан `null`**: поле в БД очищается
+        Ограничения: `name` и `price` не могут быть `null`
+      parameters:
+      - description: ID товара
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_products_handler.PatchProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_products_handler.PatchProductResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+      summary: Обновить товар
+      tags:
+      - products
+  /users:
+    get:
+      parameters:
+      - description: Размер страницы с пользователями
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение страницы с пользователями
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_features_users_handler.UserResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+      summary: Получить список пользователей
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_users_handler.PostUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_features_users_handler.PostUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+      summary: Создать пользователя
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+      tags:
+      - users
+    get:
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_users_handler.GetUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+      summary: Получить пользователя по ID
+      tags:
+      - users
+    patch:
+      consumes:
+      - application/json
+      description: |-
+        ### Логика обновления полей:
+        1. **Поле отсутствует**: игнорируется, значение в БД не изменяется
+        2. **Передано значение**: значение в БД изменяется на переданное
+        3. **Передан `null`**: поле в БД очищается
+        Ограничения: `name` и `phone` не могут быть `null`
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Тело запроса
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_features_users_handler.PatchUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_features_users_handler.PatchUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/go-marketplace_internal_core_transport_response.ErrorResponse'
+      summary: Обновить пользователя
+      tags:
+      - users
 swagger: "2.0"
