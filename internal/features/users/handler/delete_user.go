@@ -8,6 +8,15 @@ import (
 	"net/http"
 )
 
+// DeleteUser godoc
+// @Title Удалить пользователя
+// @Tags users
+// @Param id path int true "ID пользователя"
+// @Success 204
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 404 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /users/{id} [delete]
 func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)

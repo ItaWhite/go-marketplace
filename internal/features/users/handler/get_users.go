@@ -21,6 +21,16 @@ func toDTOs(domains []domain.User) []UserResponse {
 	return dtos
 }
 
+// GetUsers godoc
+// @Summary Получить список пользователей
+// @Tags users
+// @Produce json
+// @Param limit query int false "Размер страницы с пользователями"
+// @Param offset query int false "Смещение страницы с пользователями"
+// @Success 200 {object} GetUsersResponse
+// @Failure 400 {object} response.ErrorResponse
+// @Failure 500 {object} response.ErrorResponse
+// @Router /users [get]
 func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	logger := core_logger.FromContext(r.Context())
 	rh := response.NewResponseHandler(logger, w)
